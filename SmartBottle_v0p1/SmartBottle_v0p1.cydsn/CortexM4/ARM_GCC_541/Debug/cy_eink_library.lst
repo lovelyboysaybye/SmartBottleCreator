@@ -1,0 +1,4503 @@
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.fpu fpv4-sp-d16
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.thumb
+  15              		.syntax unified
+  16              		.file	"cy_eink_library.c"
+  17              		.text
+  18              	.Ltext0:
+  19              		.cfi_sections	.debug_frame
+  20              		.section	.text.Cy_EINK_Start,"ax",%progbits
+  21              		.align	2
+  22              		.global	Cy_EINK_Start
+  23              		.thumb
+  24              		.thumb_func
+  25              		.type	Cy_EINK_Start, %function
+  26              	Cy_EINK_Start:
+  27              	.LFB648:
+  28              		.file 1 "cy_eink_library.c"
+   1:cy_eink_library.c **** /******************************************************************************
+   2:cy_eink_library.c **** * File Name: cy_eink_library.c
+   3:cy_eink_library.c **** *
+   4:cy_eink_library.c **** * Version: 1.00
+   5:cy_eink_library.c **** *
+   6:cy_eink_library.c **** * Description: This file contains the library functions for controlling
+   7:cy_eink_library.c **** *              the E-INK display.
+   8:cy_eink_library.c **** *
+   9:cy_eink_library.c **** * Related Document: CE218135_BLE_Proximity.pdf
+  10:cy_eink_library.c **** *
+  11:cy_eink_library.c **** * Hardware Dependency: CY8CKIT-062-BLE PSoC 6 BLE Pioneer Kit
+  12:cy_eink_library.c **** *                      CY8CKIT-028-EPD E-INK Display Shield
+  13:cy_eink_library.c **** *
+  14:cy_eink_library.c **** ******************************************************************************
+  15:cy_eink_library.c **** * Copyright (2017), Cypress Semiconductor Corporation.
+  16:cy_eink_library.c **** ******************************************************************************
+  17:cy_eink_library.c **** * This software, including source code, documentation and related materials
+  18:cy_eink_library.c **** * ("Software") is owned by Cypress Semiconductor Corporation (Cypress) and is
+  19:cy_eink_library.c **** * protected by and subject to worldwide patent protection (United States and
+  20:cy_eink_library.c **** * foreign), United States copyright laws and international treaty provisions.
+  21:cy_eink_library.c **** * Cypress hereby grants to licensee a personal, non-exclusive, non-transferable
+  22:cy_eink_library.c **** * license to copy, use, modify, create derivative works of, and compile the
+  23:cy_eink_library.c **** * Cypress source code and derivative works for the sole purpose of creating
+  24:cy_eink_library.c **** * custom software in support of licensee product, such licensee product to be
+  25:cy_eink_library.c **** * used only in conjunction with Cypress's integrated circuit as specified in the
+  26:cy_eink_library.c **** * applicable agreement. Any reproduction, modification, translation, compilation,
+  27:cy_eink_library.c **** * or representation of this Software except as specified above is prohibited
+  28:cy_eink_library.c **** * without the express written permission of Cypress.
+  29:cy_eink_library.c **** *
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 2
+
+
+  30:cy_eink_library.c **** * Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
+  31:cy_eink_library.c **** * EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
+  32:cy_eink_library.c **** * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+  33:cy_eink_library.c **** * Cypress reserves the right to make changes to the Software without notice.
+  34:cy_eink_library.c **** * Cypress does not assume any liability arising out of the application or use
+  35:cy_eink_library.c **** * of Software or any product or circuit described in the Software. Cypress does
+  36:cy_eink_library.c **** * not authorize its products for use as critical components in any products
+  37:cy_eink_library.c **** * where a malfunction or failure may reasonably be expected to result in
+  38:cy_eink_library.c **** * significant injury or death ("ACTIVE Risk Product"). By including Cypress's
+  39:cy_eink_library.c **** * product in a ACTIVE Risk Product, the manufacturer of such system or application
+  40:cy_eink_library.c **** * assumes all risk of such use and in doing so indemnifies Cypress against all
+  41:cy_eink_library.c **** * liability. Use of this Software may be limited by and subject to the applicable
+  42:cy_eink_library.c **** * Cypress software license agreement.
+  43:cy_eink_library.c **** *****************************************************************************/
+  44:cy_eink_library.c **** /***************************************************************************
+  45:cy_eink_library.c **** * This file contains the library functions for controlling the E-INK display.
+  46:cy_eink_library.c **** *
+  47:cy_eink_library.c **** * For the details of the E-INK display and library functions, see the code  
+  48:cy_eink_library.c **** * example document of CE218133 - PSoC 6 MCU E-INK Display with CapSense
+  49:cy_eink_library.c **** *
+  50:cy_eink_library.c **** * For the details of E-INK display hardware and driver interface, see the documents
+  51:cy_eink_library.c **** * available at the following location:
+  52:cy_eink_library.c **** * http://www.pervasivedisplays.com/products/271
+  53:cy_eink_library.c ****  *******************************************************************************/
+  54:cy_eink_library.c **** 
+  55:cy_eink_library.c **** /* Header file includes */
+  56:cy_eink_library.c **** #include "cy_eink_library.h"
+  57:cy_eink_library.c **** 
+  58:cy_eink_library.c **** /* Range of ASCII printable characters: "!" to "~" */
+  59:cy_eink_library.c **** #define CY_EINK_ASCII_MIN  (uint8_t) (0x21)
+  60:cy_eink_library.c **** #define CY_EINK_ASCII_MAX  (uint8_t) (0x7E)
+  61:cy_eink_library.c **** 
+  62:cy_eink_library.c **** /*******************************************************************************
+  63:cy_eink_library.c **** * Function Name: void Cy_EINK_Start(int8_t temperature)
+  64:cy_eink_library.c **** ********************************************************************************
+  65:cy_eink_library.c **** *
+  66:cy_eink_library.c **** * Summary: Initialize the E-INK display hardware, starts the required PSoC 
+  67:cy_eink_library.c **** *  components, and also performs temperature compensation of E-INK parameters.
+  68:cy_eink_library.c **** *
+  69:cy_eink_library.c **** *  Note: This function does not turn on the E-INK display.
+  70:cy_eink_library.c **** *
+  71:cy_eink_library.c **** * Parameters:
+  72:cy_eink_library.c **** *  int8_t temperature : Ambient temperature in degree Celsius
+  73:cy_eink_library.c **** *
+  74:cy_eink_library.c **** * Return:
+  75:cy_eink_library.c **** *  None
+  76:cy_eink_library.c **** *
+  77:cy_eink_library.c **** * Side Effects:
+  78:cy_eink_library.c **** *  Lower ambient temperature results in higher refresh times
+  79:cy_eink_library.c **** *
+  80:cy_eink_library.c **** *******************************************************************************/
+  81:cy_eink_library.c **** void Cy_EINK_Start(int8_t temperature)
+  82:cy_eink_library.c **** {
+  29              		.loc 1 82 0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 3
+
+
+  33              	.LVL0:
+  34 0000 10B5     		push	{r4, lr}
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 4, -8
+  37              		.cfi_offset 14, -4
+  38 0002 0446     		mov	r4, r0
+  83:cy_eink_library.c ****     /* Initialize the E-INK display hardware and associated PSoC components */
+  84:cy_eink_library.c ****     Pv_EINK_Init();
+  39              		.loc 1 84 0
+  40 0004 FFF7FEFF 		bl	Pv_EINK_Init
+  41              	.LVL1:
+  85:cy_eink_library.c ****     
+  86:cy_eink_library.c ****     /* Perform temperature compensation of E-INK parameters */
+  87:cy_eink_library.c ****     Pv_EINK_SetTempFactor(temperature);
+  42              		.loc 1 87 0
+  43 0008 2046     		mov	r0, r4
+  44 000a FFF7FEFF 		bl	Pv_EINK_SetTempFactor
+  45              	.LVL2:
+  46 000e 10BD     		pop	{r4, pc}
+  47              		.cfi_endproc
+  48              	.LFE648:
+  49              		.size	Cy_EINK_Start, .-Cy_EINK_Start
+  50              		.section	.text.Cy_EINK_Power,"ax",%progbits
+  51              		.align	2
+  52              		.global	Cy_EINK_Power
+  53              		.thumb
+  54              		.thumb_func
+  55              		.type	Cy_EINK_Power, %function
+  56              	Cy_EINK_Power:
+  57              	.LFB649:
+  88:cy_eink_library.c **** }
+  89:cy_eink_library.c **** 
+  90:cy_eink_library.c **** /*******************************************************************************
+  91:cy_eink_library.c **** * Function Name: bool Cy_EINK_Power(bool powerCtrl)
+  92:cy_eink_library.c **** ********************************************************************************
+  93:cy_eink_library.c **** *
+  94:cy_eink_library.c **** * Summary: This function is used to turn on/off the E-INK display power.
+  95:cy_eink_library.c **** *
+  96:cy_eink_library.c **** *  Note: This function can not be used to clear the E-INK display. The display 
+  97:cy_eink_library.c **** *  will retain the previously written frame even when it's turned off.
+  98:cy_eink_library.c **** *
+  99:cy_eink_library.c **** * Parameters:
+ 100:cy_eink_library.c **** *  bool powerCtrl : "False" turns off and "True" turns on the display.
+ 101:cy_eink_library.c **** *
+ 102:cy_eink_library.c **** * Return:
+ 103:cy_eink_library.c **** *  bool           : "True" if operation was successful; "False" otherwise
+ 104:cy_eink_library.c **** *
+ 105:cy_eink_library.c **** * Side Effects:
+ 106:cy_eink_library.c **** *  None
+ 107:cy_eink_library.c **** *
+ 108:cy_eink_library.c **** *******************************************************************************/
+ 109:cy_eink_library.c **** bool Cy_EINK_Power(bool powerCtrl)
+ 110:cy_eink_library.c **** {
+  58              		.loc 1 110 0
+  59              		.cfi_startproc
+  60              		@ args = 0, pretend = 0, frame = 0
+  61              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 4
+
+
+  62              	.LVL3:
+  63 0000 08B5     		push	{r3, lr}
+  64              		.cfi_def_cfa_offset 8
+  65              		.cfi_offset 3, -8
+  66              		.cfi_offset 14, -4
+  67              	.LVL4:
+ 111:cy_eink_library.c ****     /* Variable to store operation status */
+ 112:cy_eink_library.c ****     uint8_t pwrStatus = CY_EINK_OPERATION_FAILURE;
+ 113:cy_eink_library.c ****     
+ 114:cy_eink_library.c ****     /* Turn on the E-INK power if powerCtrl is "true" */
+ 115:cy_eink_library.c ****     if (powerCtrl == CY_EINK_ON)
+  68              		.loc 1 115 0
+  69 0002 10B1     		cbz	r0, .L4
+ 116:cy_eink_library.c ****     {
+ 117:cy_eink_library.c ****         pwrStatus = Pv_EINK_HardwarePowerOn();
+  70              		.loc 1 117 0
+  71 0004 FFF7FEFF 		bl	Pv_EINK_HardwarePowerOn
+  72              	.LVL5:
+  73 0008 01E0     		b	.L5
+  74              	.LVL6:
+  75              	.L4:
+ 118:cy_eink_library.c ****     }
+ 119:cy_eink_library.c ****     /* Turn off the E-INK power if powerCtrl is "false" */
+ 120:cy_eink_library.c ****     else
+ 121:cy_eink_library.c ****     {
+ 122:cy_eink_library.c ****         pwrStatus = Pv_EINK_HardwarePowerOff();
+  76              		.loc 1 122 0
+  77 000a FFF7FEFF 		bl	Pv_EINK_HardwarePowerOff
+  78              	.LVL7:
+  79              	.L5:
+ 123:cy_eink_library.c ****     }
+ 124:cy_eink_library.c ****     /* If the operation was successful, return "true" */
+ 125:cy_eink_library.c ****     if (pwrStatus == PV_EINK_RES_OK)
+  80              		.loc 1 125 0
+  81 000e 08B9     		cbnz	r0, .L7
+ 126:cy_eink_library.c ****     {
+ 127:cy_eink_library.c ****         pwrStatus = CY_EINK_OPERATION_SUCCESS;
+  82              		.loc 1 127 0
+  83 0010 0120     		movs	r0, #1
+  84              	.LVL8:
+  85 0012 08BD     		pop	{r3, pc}
+  86              	.LVL9:
+  87              	.L7:
+ 128:cy_eink_library.c ****     }
+ 129:cy_eink_library.c ****     /* If the operation was not successful, return "false" */
+ 130:cy_eink_library.c ****     else
+ 131:cy_eink_library.c ****     {
+ 132:cy_eink_library.c ****         pwrStatus = CY_EINK_OPERATION_FAILURE;
+  88              		.loc 1 132 0
+  89 0014 0020     		movs	r0, #0
+  90              	.LVL10:
+ 133:cy_eink_library.c ****     }
+ 134:cy_eink_library.c ****     
+ 135:cy_eink_library.c ****     /* Return the outcome of the power control operation */
+ 136:cy_eink_library.c ****     return (pwrStatus);
+ 137:cy_eink_library.c **** }
+  91              		.loc 1 137 0
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 5
+
+
+  92 0016 08BD     		pop	{r3, pc}
+  93              		.cfi_endproc
+  94              	.LFE649:
+  95              		.size	Cy_EINK_Power, .-Cy_EINK_Power
+  96              		.section	.text.Cy_EINK_Clear,"ax",%progbits
+  97              		.align	2
+  98              		.global	Cy_EINK_Clear
+  99              		.thumb
+ 100              		.thumb_func
+ 101              		.type	Cy_EINK_Clear, %function
+ 102              	Cy_EINK_Clear:
+ 103              	.LFB650:
+ 138:cy_eink_library.c **** 
+ 139:cy_eink_library.c **** /*******************************************************************************
+ 140:cy_eink_library.c **** * Function Name: void Cy_EINK_Clear(bool background, bool powerCycle)
+ 141:cy_eink_library.c **** ********************************************************************************
+ 142:cy_eink_library.c **** *
+ 143:cy_eink_library.c **** * Summary: This function is used to clear the display to all white or all black
+ 144:cy_eink_library.c **** *  pixels.
+ 145:cy_eink_library.c **** *
+ 146:cy_eink_library.c **** *  Note1: The E-INK display should be powered on (using Cy_EINK_Power function) 
+ 147:cy_eink_library.c **** *  before calling this function if "powerCycle" is false. Otherwise the display 
+ 148:cy_eink_library.c **** *  won't be cleared.
+ 149:cy_eink_library.c **** *
+ 150:cy_eink_library.c **** *  Note2: This function is intended to be called only after a reset/power up.
+ 151:cy_eink_library.c **** *  Use Cy_EINK_ShowFrame() function to clear the display if you know the frame
+ 152:cy_eink_library.c **** *  that has been written to the display.
+ 153:cy_eink_library.c **** *
+ 154:cy_eink_library.c **** * Parameters:
+ 155:cy_eink_library.c **** *  bool background   : False for black background and True for white background.
+ 156:cy_eink_library.c **** *  bool powerCycle   : True for automatic power cycle. False otherwise
+ 157:cy_eink_library.c **** * 
+ 158:cy_eink_library.c **** * Return:
+ 159:cy_eink_library.c **** *  None
+ 160:cy_eink_library.c **** *
+ 161:cy_eink_library.c **** * Side Effects:
+ 162:cy_eink_library.c **** *  This is a blocking function that can take as many as 2 seconds 
+ 163:cy_eink_library.c **** *
+ 164:cy_eink_library.c **** *******************************************************************************/
+ 165:cy_eink_library.c **** void Cy_EINK_Clear(bool background, bool powerCycle)
+ 166:cy_eink_library.c **** {
+ 104              		.loc 1 166 0
+ 105              		.cfi_startproc
+ 106              		@ args = 0, pretend = 0, frame = 0
+ 107              		@ frame_needed = 0, uses_anonymous_args = 0
+ 108              	.LVL11:
+ 109 0000 38B5     		push	{r3, r4, r5, lr}
+ 110              		.cfi_def_cfa_offset 16
+ 111              		.cfi_offset 3, -16
+ 112              		.cfi_offset 4, -12
+ 113              		.cfi_offset 5, -8
+ 114              		.cfi_offset 14, -4
+ 115 0002 0446     		mov	r4, r0
+ 167:cy_eink_library.c ****     /* If power cycle operation requested, turn on E-INK power */
+ 168:cy_eink_library.c ****     if (powerCycle)
+ 116              		.loc 1 168 0
+ 117 0004 0D46     		mov	r5, r1
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 6
+
+
+ 118 0006 11B1     		cbz	r1, .L10
+ 169:cy_eink_library.c ****     {
+ 170:cy_eink_library.c ****         Cy_EINK_Power(CY_EINK_ON);
+ 119              		.loc 1 170 0
+ 120 0008 0120     		movs	r0, #1
+ 121              	.LVL12:
+ 122 000a FFF7FEFF 		bl	Cy_EINK_Power
+ 123              	.LVL13:
+ 124              	.L10:
+ 171:cy_eink_library.c ****     }
+ 172:cy_eink_library.c ****     /* Clear the display to white background */
+ 173:cy_eink_library.c ****     if (background == CY_EINK_WHITE_BACKGROUND)
+ 125              		.loc 1 173 0
+ 126 000e 44B1     		cbz	r4, .L11
+ 174:cy_eink_library.c ****     {
+ 175:cy_eink_library.c ****         /* Two consecutive display updates to reduce ghosting */
+ 176:cy_eink_library.c ****         Pv_EINK_FullStageHandler(CY_EINK_WHITE_FRAME, PV_EINK_STAGE4);
+ 127              		.loc 1 176 0
+ 128 0010 0321     		movs	r1, #3
+ 129 0012 0020     		movs	r0, #0
+ 130 0014 FFF7FEFF 		bl	Pv_EINK_FullStageHandler
+ 131              	.LVL14:
+ 177:cy_eink_library.c ****         Pv_EINK_FullStageHandler(CY_EINK_WHITE_FRAME, PV_EINK_STAGE4);
+ 132              		.loc 1 177 0
+ 133 0018 0321     		movs	r1, #3
+ 134 001a 0020     		movs	r0, #0
+ 135 001c FFF7FEFF 		bl	Pv_EINK_FullStageHandler
+ 136              	.LVL15:
+ 137 0020 09E0     		b	.L12
+ 138              	.L11:
+ 178:cy_eink_library.c ****     }
+ 179:cy_eink_library.c ****     /* Clear the display to black background */
+ 180:cy_eink_library.c ****     else if (background == CY_EINK_BLACK_BACKGROUND)
+ 139              		.loc 1 180 0
+ 140 0022 44B9     		cbnz	r4, .L12
+ 181:cy_eink_library.c ****     {
+ 182:cy_eink_library.c ****         /* Two consecutive display updates to reduce ghosting */
+ 183:cy_eink_library.c ****         Pv_EINK_FullStageHandler(CY_EINK_BLACK_FRAME, PV_EINK_STAGE4);
+ 141              		.loc 1 183 0
+ 142 0024 064C     		ldr	r4, .L15
+ 143 0026 0321     		movs	r1, #3
+ 144 0028 2046     		mov	r0, r4
+ 145 002a FFF7FEFF 		bl	Pv_EINK_FullStageHandler
+ 146              	.LVL16:
+ 184:cy_eink_library.c ****         Pv_EINK_FullStageHandler(CY_EINK_BLACK_FRAME, PV_EINK_STAGE4);
+ 147              		.loc 1 184 0
+ 148 002e 0321     		movs	r1, #3
+ 149 0030 2046     		mov	r0, r4
+ 150 0032 FFF7FEFF 		bl	Pv_EINK_FullStageHandler
+ 151              	.LVL17:
+ 152              	.L12:
+ 185:cy_eink_library.c ****     }
+ 186:cy_eink_library.c ****     else
+ 187:cy_eink_library.c ****     {
+ 188:cy_eink_library.c ****     }
+ 189:cy_eink_library.c ****     
+ 190:cy_eink_library.c ****     /* If power cycle operation requested, turn off E-INK power */
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 7
+
+
+ 191:cy_eink_library.c ****     if (powerCycle)
+ 153              		.loc 1 191 0
+ 154 0036 15B1     		cbz	r5, .L9
+ 192:cy_eink_library.c ****     {
+ 193:cy_eink_library.c ****         Cy_EINK_Power(CY_EINK_OFF);
+ 155              		.loc 1 193 0
+ 156 0038 0020     		movs	r0, #0
+ 157 003a FFF7FEFF 		bl	Cy_EINK_Power
+ 158              	.LVL18:
+ 159              	.L9:
+ 160 003e 38BD     		pop	{r3, r4, r5, pc}
+ 161              	.L16:
+ 162              		.align	2
+ 163              	.L15:
+ 164 0040 FFFF0F10 		.word	269484031
+ 165              		.cfi_endproc
+ 166              	.LFE650:
+ 167              		.size	Cy_EINK_Clear, .-Cy_EINK_Clear
+ 168              		.section	.text.Cy_EINK_ShowFrame,"ax",%progbits
+ 169              		.align	2
+ 170              		.global	Cy_EINK_ShowFrame
+ 171              		.thumb
+ 172              		.thumb_func
+ 173              		.type	Cy_EINK_ShowFrame, %function
+ 174              	Cy_EINK_ShowFrame:
+ 175              	.LFB651:
+ 194:cy_eink_library.c ****     }
+ 195:cy_eink_library.c **** }
+ 196:cy_eink_library.c **** 
+ 197:cy_eink_library.c **** /*******************************************************************************
+ 198:cy_eink_library.c **** * Function Name: void Cy_EINK_ShowFrame(cy_eink_frame_t* prevFrame, 
+ 199:cy_eink_library.c **** *      cy_eink_frame_t* newFrame,CY_EINK_UpdateType updateType, bool powerCycle)
+ 200:cy_eink_library.c **** ********************************************************************************
+ 201:cy_eink_library.c **** *
+ 202:cy_eink_library.c **** * Summary: Updates the E-INK display with a frame/image stored in the flash or RAM.
+ 203:cy_eink_library.c **** *
+ 204:cy_eink_library.c **** *  Notes: This function requires the previous frame data as well as the new frame
+ 205:cy_eink_library.c **** *  data. If the previous frame data changes from the actual frame previously 
+ 206:cy_eink_library.c **** *  written to the display, considerable ghosting may occur.
+ 207:cy_eink_library.c **** *
+ 208:cy_eink_library.c **** *  The E-INK display should be powered on (using Cy_EINK_Power function) before 
+ 209:cy_eink_library.c **** *  calling this function, if "powerCycle" parameter is false. Otherwise the display 
+ 210:cy_eink_library.c **** *  won't be updated.
+ 211:cy_eink_library.c **** *
+ 212:cy_eink_library.c **** * Parameters:
+ 213:cy_eink_library.c **** *  cy_eink_frame_t* prevFrame    : Pointer to the previous frame written on the display
+ 214:cy_eink_library.c **** *  cy_eink_frame_t* newFrame     : Pointer to the new frame that need to be written
+ 215:cy_eink_library.c **** *  cy_eink_update_t              : Full update (2/4 stages) or  Partial update
+ 216:cy_eink_library.c **** *  bool powerCycle               : "true" for automatic power cycle, "false" for manual
+ 217:cy_eink_library.c **** *
+ 218:cy_eink_library.c **** *  Return:
+ 219:cy_eink_library.c **** *  None
+ 220:cy_eink_library.c **** *
+ 221:cy_eink_library.c **** * Side Effects:
+ 222:cy_eink_library.c **** *  This is a blocking function that can take as many as 2 seconds 
+ 223:cy_eink_library.c **** *
+ 224:cy_eink_library.c **** ********************************************************************************/
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 8
+
+
+ 225:cy_eink_library.c **** void Cy_EINK_ShowFrame(cy_eink_frame_t* prevFrame, cy_eink_frame_t* newFrame,
+ 226:cy_eink_library.c ****                        cy_eink_update_t updateType, bool powerCycle)
+ 227:cy_eink_library.c **** {
+ 176              		.loc 1 227 0
+ 177              		.cfi_startproc
+ 178              		@ args = 0, pretend = 0, frame = 0
+ 179              		@ frame_needed = 0, uses_anonymous_args = 0
+ 180              	.LVL19:
+ 181 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 182              		.cfi_def_cfa_offset 24
+ 183              		.cfi_offset 3, -24
+ 184              		.cfi_offset 4, -20
+ 185              		.cfi_offset 5, -16
+ 186              		.cfi_offset 6, -12
+ 187              		.cfi_offset 7, -8
+ 188              		.cfi_offset 14, -4
+ 189 0002 0746     		mov	r7, r0
+ 190 0004 0E46     		mov	r6, r1
+ 191 0006 1446     		mov	r4, r2
+ 228:cy_eink_library.c ****     /* If power cycle operation requested, turn on E-INK power */
+ 229:cy_eink_library.c ****     if (powerCycle)
+ 192              		.loc 1 229 0
+ 193 0008 1D46     		mov	r5, r3
+ 194 000a 13B1     		cbz	r3, .L18
+ 230:cy_eink_library.c ****     {
+ 231:cy_eink_library.c ****         Cy_EINK_Power(CY_EINK_ON);
+ 195              		.loc 1 231 0
+ 196 000c 0120     		movs	r0, #1
+ 197              	.LVL20:
+ 198 000e FFF7FEFF 		bl	Cy_EINK_Power
+ 199              	.LVL21:
+ 200              	.L18:
+ 232:cy_eink_library.c ****     }
+ 233:cy_eink_library.c ****     /* Partial update stage */
+ 234:cy_eink_library.c ****     if (updateType == CY_EINK_PARTIAL)
+ 201              		.loc 1 234 0
+ 202 0012 24B9     		cbnz	r4, .L19
+ 235:cy_eink_library.c ****     {
+ 236:cy_eink_library.c ****         /* Update the display with changes from previous frame */
+ 237:cy_eink_library.c ****         Pv_EINK_PartialStageHandler(prevFrame, newFrame);
+ 203              		.loc 1 237 0
+ 204 0014 3146     		mov	r1, r6
+ 205 0016 3846     		mov	r0, r7
+ 206 0018 FFF7FEFF 		bl	Pv_EINK_PartialStageHandler
+ 207              	.LVL22:
+ 208 001c 15E0     		b	.L20
+ 209              	.L19:
+ 238:cy_eink_library.c ****     }
+ 239:cy_eink_library.c ****     /* Full update stages */
+ 240:cy_eink_library.c ****     else if ((updateType == CY_EINK_FULL_4STAGE) || 
+ 210              		.loc 1 240 0
+ 211 001e 631E     		subs	r3, r4, #1
+ 212 0020 DBB2     		uxtb	r3, r3
+ 213 0022 012B     		cmp	r3, #1
+ 214 0024 11D8     		bhi	.L20
+ 241:cy_eink_library.c ****              (updateType == CY_EINK_FULL_2STAGE))
+ 242:cy_eink_library.c ****     {
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 9
+
+
+ 243:cy_eink_library.c ****         /* Stage 1: update the display with the inverted version of the previous 
+ 244:cy_eink_library.c ****            frame */
+ 245:cy_eink_library.c ****         Pv_EINK_FullStageHandler(prevFrame, PV_EINK_STAGE1);
+ 215              		.loc 1 245 0
+ 216 0026 0021     		movs	r1, #0
+ 217 0028 3846     		mov	r0, r7
+ 218 002a FFF7FEFF 		bl	Pv_EINK_FullStageHandler
+ 219              	.LVL23:
+ 246:cy_eink_library.c ****         
+ 247:cy_eink_library.c ****         /* Additional stages that reduce ghosting for a 4 stage full update */
+ 248:cy_eink_library.c ****         if (updateType == CY_EINK_FULL_4STAGE)
+ 220              		.loc 1 248 0
+ 221 002e 012C     		cmp	r4, #1
+ 222 0030 07D1     		bne	.L21
+ 249:cy_eink_library.c ****         {
+ 250:cy_eink_library.c ****             /* Stage 2: update the display with an all white frame */
+ 251:cy_eink_library.c ****             Pv_EINK_FullStageHandler(prevFrame, PV_EINK_STAGE2);
+ 223              		.loc 1 251 0
+ 224 0032 0121     		movs	r1, #1
+ 225 0034 3846     		mov	r0, r7
+ 226 0036 FFF7FEFF 		bl	Pv_EINK_FullStageHandler
+ 227              	.LVL24:
+ 252:cy_eink_library.c ****             /* Stage 3: update the display with the inverted version of the new 
+ 253:cy_eink_library.c ****                frame */
+ 254:cy_eink_library.c ****             Pv_EINK_FullStageHandler(newFrame, PV_EINK_STAGE3);
+ 228              		.loc 1 254 0
+ 229 003a 0221     		movs	r1, #2
+ 230 003c 3046     		mov	r0, r6
+ 231 003e FFF7FEFF 		bl	Pv_EINK_FullStageHandler
+ 232              	.LVL25:
+ 233              	.L21:
+ 255:cy_eink_library.c ****         }
+ 256:cy_eink_library.c ****         
+ 257:cy_eink_library.c ****         /* Stage 4: update the display with the new frame */
+ 258:cy_eink_library.c ****         Pv_EINK_FullStageHandler(newFrame, PV_EINK_STAGE4);
+ 234              		.loc 1 258 0
+ 235 0042 0321     		movs	r1, #3
+ 236 0044 3046     		mov	r0, r6
+ 237 0046 FFF7FEFF 		bl	Pv_EINK_FullStageHandler
+ 238              	.LVL26:
+ 239              	.L20:
+ 259:cy_eink_library.c ****     }
+ 260:cy_eink_library.c ****     else
+ 261:cy_eink_library.c ****     {
+ 262:cy_eink_library.c ****     }
+ 263:cy_eink_library.c ****     
+ 264:cy_eink_library.c ****     /* If power cycle operation requested, turn off E-INK power */
+ 265:cy_eink_library.c ****     if (powerCycle)
+ 240              		.loc 1 265 0
+ 241 004a 15B1     		cbz	r5, .L17
+ 266:cy_eink_library.c ****     {
+ 267:cy_eink_library.c ****         Cy_EINK_Power(CY_EINK_OFF);
+ 242              		.loc 1 267 0
+ 243 004c 0020     		movs	r0, #0
+ 244 004e FFF7FEFF 		bl	Cy_EINK_Power
+ 245              	.LVL27:
+ 246              	.L17:
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 10
+
+
+ 247 0052 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 248              		.cfi_endproc
+ 249              	.LFE651:
+ 250              		.size	Cy_EINK_ShowFrame, .-Cy_EINK_ShowFrame
+ 251              		.section	.text.Cy_EINK_ImageToFrameBuffer,"ax",%progbits
+ 252              		.align	2
+ 253              		.global	Cy_EINK_ImageToFrameBuffer
+ 254              		.thumb
+ 255              		.thumb_func
+ 256              		.type	Cy_EINK_ImageToFrameBuffer, %function
+ 257              	Cy_EINK_ImageToFrameBuffer:
+ 258              	.LFB652:
+ 268:cy_eink_library.c ****     }
+ 269:cy_eink_library.c **** }
+ 270:cy_eink_library.c **** 
+ 271:cy_eink_library.c **** /*******************************************************************************
+ 272:cy_eink_library.c **** * Function Name: void Cy_EINK_ImageToFrameBuffer(cy_eink_frame_t* frameBuffer,
+ 273:cy_eink_library.c **** *                               cy_eink_frame_t* image, uint8_t* imgCoordinates)
+ 274:cy_eink_library.c **** ********************************************************************************
+ 275:cy_eink_library.c **** *
+ 276:cy_eink_library.c **** * Summary: Copies pixel block data between the specified x and y coordinates 
+ 277:cy_eink_library.c **** *  from an image (typically stored in the flash) to a frame buffer in RAM.
+ 278:cy_eink_library.c **** *
+ 279:cy_eink_library.c **** *  Notes: Image array should be of the same size as frame buffer.
+ 280:cy_eink_library.c **** *
+ 281:cy_eink_library.c **** *  Copying is done at byte level. Pixel level operations are not supported.
+ 282:cy_eink_library.c **** *
+ 283:cy_eink_library.c **** *  This function does not update the E-INK display. After frame buffer update,
+ 284:cy_eink_library.c **** *  use Cy_EINK_ShowFrame() function to update the display if required.
+ 285:cy_eink_library.c **** *
+ 286:cy_eink_library.c **** *  This function can be used to clear the frame buffer by passing an all-white 
+ 287:cy_eink_library.c **** *  or an all-black image.
+ 288:cy_eink_library.c **** *
+ 289:cy_eink_library.c **** * Parameters:
+ 290:cy_eink_library.c **** *  cy_eink_frame_t* frameBuffer   : Pointer to the frame buffer array in RAM
+ 291:cy_eink_library.c **** *  cy_eink_frame_t* image         : Pointer to the image array (typically in flash)
+ 292:cy_eink_library.c **** *  uint8_t* imgCoordinates   : Pointer to a 4-byte array of image coordinates
+ 293:cy_eink_library.c **** *
+ 294:cy_eink_library.c **** * Return:
+ 295:cy_eink_library.c **** *  None
+ 296:cy_eink_library.c **** *
+ 297:cy_eink_library.c **** * Side Effects:
+ 298:cy_eink_library.c **** *  This is a blocking function that can take as many as 5808 RAM write cycles
+ 299:cy_eink_library.c **** *  to complete.
+ 300:cy_eink_library.c **** *
+ 301:cy_eink_library.c **** *******************************************************************************/
+ 302:cy_eink_library.c **** void Cy_EINK_ImageToFrameBuffer(cy_eink_frame_t* frameBuffer, cy_eink_frame_t* image,
+ 303:cy_eink_library.c ****                                 uint8_t* imgCoordinates)
+ 304:cy_eink_library.c **** {
+ 259              		.loc 1 304 0
+ 260              		.cfi_startproc
+ 261              		@ args = 0, pretend = 0, frame = 0
+ 262              		@ frame_needed = 0, uses_anonymous_args = 0
+ 263              	.LVL28:
+ 264 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 265              		.cfi_def_cfa_offset 24
+ 266              		.cfi_offset 3, -24
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 11
+
+
+ 267              		.cfi_offset 4, -20
+ 268              		.cfi_offset 5, -16
+ 269              		.cfi_offset 6, -12
+ 270              		.cfi_offset 7, -8
+ 271              		.cfi_offset 14, -4
+ 272 0002 0746     		mov	r7, r0
+ 273 0004 0E46     		mov	r6, r1
+ 274 0006 1546     		mov	r5, r2
+ 305:cy_eink_library.c ****     /* Counter variable for horizontal pixel lines */
+ 306:cy_eink_library.c ****     uint16_t pixelLineCounter;
+ 307:cy_eink_library.c ****     
+ 308:cy_eink_library.c ****     /* Variable that stores the starting location of the current pixel line */
+ 309:cy_eink_library.c ****     uint16_t startLocation;
+ 310:cy_eink_library.c ****     
+ 311:cy_eink_library.c ****     /* Variable that stores the length of the pixel line */
+ 312:cy_eink_library.c ****     uint16_t lineLength;
+ 313:cy_eink_library.c ****     
+ 314:cy_eink_library.c ****     /* Do this for all horizontal pixel lines between Y1 and Y2 coordinates */
+ 315:cy_eink_library.c ****     for (pixelLineCounter  = imgCoordinates[CY_EINK_IMG_Y1];
+ 275              		.loc 1 315 0
+ 276 0008 9478     		ldrb	r4, [r2, #2]	@ zero_extendqisi2
+ 277              	.LVL29:
+ 278 000a 0DE0     		b	.L25
+ 279              	.LVL30:
+ 280              	.L26:
+ 316:cy_eink_library.c ****          pixelLineCounter <= imgCoordinates[CY_EINK_IMG_Y2];
+ 317:cy_eink_library.c ****          pixelLineCounter++)
+ 318:cy_eink_library.c ****     {
+ 319:cy_eink_library.c ****         
+ 320:cy_eink_library.c ****         /* Find the starting location of the pixel line */
+ 321:cy_eink_library.c ****         startLocation = (pixelLineCounter * PV_EINK_HORIZONTAL_SIZE) + 
+ 281              		.loc 1 321 0
+ 282 000c 2A78     		ldrb	r2, [r5]	@ zero_extendqisi2
+ 283 000e 04EB4410 		add	r0, r4, r4, lsl #5
+ 284 0012 1044     		add	r0, r0, r2
+ 285 0014 80B2     		uxth	r0, r0
+ 286              	.LVL31:
+ 322:cy_eink_library.c ****                          imgCoordinates[CY_EINK_IMG_X1];
+ 323:cy_eink_library.c ****         
+ 324:cy_eink_library.c ****        /* Find the length of the pixel line to be copied */
+ 325:cy_eink_library.c ****         lineLength = imgCoordinates[CY_EINK_IMG_X2] - imgCoordinates[CY_EINK_IMG_X1];
+ 287              		.loc 1 325 0
+ 288 0016 6B78     		ldrb	r3, [r5, #1]	@ zero_extendqisi2
+ 289 0018 9A1A     		subs	r2, r3, r2
+ 290              	.LVL32:
+ 326:cy_eink_library.c ****         
+ 327:cy_eink_library.c ****         /* Copy the pixel line from the image to the same location in the 
+ 328:cy_eink_library.c ****            frame buffer */
+ 329:cy_eink_library.c ****         memcpy (&frameBuffer[startLocation], &image[startLocation], lineLength);
+ 291              		.loc 1 329 0
+ 292 001a 92B2     		uxth	r2, r2
+ 293 001c 3118     		adds	r1, r6, r0
+ 294 001e 3844     		add	r0, r0, r7
+ 295              	.LVL33:
+ 296 0020 FFF7FEFF 		bl	memcpy
+ 297              	.LVL34:
+ 317:cy_eink_library.c ****     {
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 12
+
+
+ 298              		.loc 1 317 0
+ 299 0024 0134     		adds	r4, r4, #1
+ 300              	.LVL35:
+ 301 0026 A4B2     		uxth	r4, r4
+ 302              	.LVL36:
+ 303              	.L25:
+ 316:cy_eink_library.c ****          pixelLineCounter++)
+ 304              		.loc 1 316 0 discriminator 1
+ 305 0028 EB78     		ldrb	r3, [r5, #3]	@ zero_extendqisi2
+ 315:cy_eink_library.c ****          pixelLineCounter <= imgCoordinates[CY_EINK_IMG_Y2];
+ 306              		.loc 1 315 0 discriminator 1
+ 307 002a 9C42     		cmp	r4, r3
+ 308 002c EED9     		bls	.L26
+ 330:cy_eink_library.c ****         
+ 331:cy_eink_library.c ****     }
+ 332:cy_eink_library.c **** }
+ 309              		.loc 1 332 0
+ 310 002e F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 311              		.cfi_endproc
+ 312              	.LFE652:
+ 313              		.size	Cy_EINK_ImageToFrameBuffer, .-Cy_EINK_ImageToFrameBuffer
+ 314              		.section	.text.Cy_EINK_TextToFrameBuffer,"ax",%progbits
+ 315              		.align	2
+ 316              		.global	Cy_EINK_TextToFrameBuffer
+ 317              		.thumb
+ 318              		.thumb_func
+ 319              		.type	Cy_EINK_TextToFrameBuffer, %function
+ 320              	Cy_EINK_TextToFrameBuffer:
+ 321              	.LFB653:
+ 333:cy_eink_library.c **** 
+ 334:cy_eink_library.c **** /*******************************************************************************
+ 335:cy_eink_library.c **** * Function Name: void Cy_EINK_TextToFrameBuffer(cy_eink_frame_t* frameBuffer, 
+ 336:cy_eink_library.c **** *                char* string, cy_eink_font_t* fontInfo , uint8_t* fontCor)
+ 337:cy_eink_library.c **** ********************************************************************************
+ 338:cy_eink_library.c **** *
+ 339:cy_eink_library.c **** * Summary: Converts a text input (string) to pixel data and stores it at the
+ 340:cy_eink_library.c **** *  specified coordinates of a frame buffer.
+ 341:cy_eink_library.c **** *
+ 342:cy_eink_library.c **** *  Notes: This function only supports printable ASCII characters from "!" to "~"
+ 343:cy_eink_library.c **** *
+ 344:cy_eink_library.c **** *  X and Y locations used in this function are font coordinates, rather than the
+ 345:cy_eink_library.c **** *  pixel coordinates used in Cy_EINK_ImageToFrameBuffer() function. See the 
+ 346:cy_eink_library.c **** *  CY_EINK_fonts.h for details.
+ 347:cy_eink_library.c **** *
+ 348:cy_eink_library.c **** *  This function does not update the E-INK display. After frame buffer update,
+ 349:cy_eink_library.c **** *  use CY_EINK_ShowFrame() function to update the display if required.
+ 350:cy_eink_library.c **** *
+ 351:cy_eink_library.c **** * Parameters:
+ 352:cy_eink_library.c **** *  cy_eink_frame_t* frameBuffer : Pointer to the frame buffer array in RAM
+ 353:cy_eink_library.c **** *  char* string                 : Pointer to the string
+ 354:cy_eink_library.c **** *  cy_eink_font_t* fontInfo     : Structure that stores font information
+ 355:cy_eink_library.c **** *  uint8_t* fontCor             : Pointer to the 2-byte array containing X and
+ 356:cy_eink_library.c **** *                                 Y locations
+ 357:cy_eink_library.c **** *
+ 358:cy_eink_library.c **** * Return:
+ 359:cy_eink_library.c **** *  None
+ 360:cy_eink_library.c **** *
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 13
+
+
+ 361:cy_eink_library.c **** * Side Effects:
+ 362:cy_eink_library.c **** *  This is a blocking function that can take as many as 5808 RAM write cycles
+ 363:cy_eink_library.c **** *  to complete.
+ 364:cy_eink_library.c **** *
+ 365:cy_eink_library.c **** *******************************************************************************/
+ 366:cy_eink_library.c **** void Cy_EINK_TextToFrameBuffer(cy_eink_frame_t* frameBuffer, char* string, 
+ 367:cy_eink_library.c ****                             cy_eink_font_t* fontInfo, uint8_t* fontCor)
+ 368:cy_eink_library.c **** { 
+ 322              		.loc 1 368 0
+ 323              		.cfi_startproc
+ 324              		@ args = 0, pretend = 0, frame = 0
+ 325              		@ frame_needed = 0, uses_anonymous_args = 0
+ 326              	.LVL37:
+ 327 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 328              		.cfi_def_cfa_offset 32
+ 329              		.cfi_offset 4, -32
+ 330              		.cfi_offset 5, -28
+ 331              		.cfi_offset 6, -24
+ 332              		.cfi_offset 7, -20
+ 333              		.cfi_offset 8, -16
+ 334              		.cfi_offset 9, -12
+ 335              		.cfi_offset 10, -8
+ 336              		.cfi_offset 14, -4
+ 337 0004 8A46     		mov	r10, r1
+ 338              	.LVL38:
+ 369:cy_eink_library.c ****     /* Pointer variable for current character under conversion */
+ 370:cy_eink_library.c ****     char* currentChar;
+ 371:cy_eink_library.c ****     
+ 372:cy_eink_library.c ****     /* Variable for storing the location in the frame buffer to which 
+ 373:cy_eink_library.c ****        the font data is printed */
+ 374:cy_eink_library.c ****     uint16_t printLocation;
+ 375:cy_eink_library.c ****     /* Variable for storing the character location in the font */
+ 376:cy_eink_library.c ****     uint16_t charLocation;
+ 377:cy_eink_library.c ****     
+ 378:cy_eink_library.c ****     /* Variable that stores the pixel data byte location in the frame 
+ 379:cy_eink_library.c ****        buffer */
+ 380:cy_eink_library.c ****     uint16_t frameByte;
+ 381:cy_eink_library.c ****     /* Variable that stores the pixel data byte location in the font array */
+ 382:cy_eink_library.c ****     uint16_t fontByte;
+ 383:cy_eink_library.c ****     
+ 384:cy_eink_library.c ****     /* Counter variable for the vertical loop */
+ 385:cy_eink_library.c ****     uint8_t verticalCounter;
+ 386:cy_eink_library.c ****     /* Counter variable for the horizontal loop */
+ 387:cy_eink_library.c ****     uint8_t horizontalCounter;
+ 388:cy_eink_library.c ****     
+ 389:cy_eink_library.c ****     /* Repeat this process until the null character of the string is reached */
+ 390:cy_eink_library.c ****     for (currentChar = string;  *currentChar != '\0'; currentChar++)
+ 339              		.loc 1 390 0
+ 340 0006 80E0     		b	.L29
+ 341              	.LVL39:
+ 342              	.L43:
+ 391:cy_eink_library.c ****     {
+ 392:cy_eink_library.c ****         /* Check if X and Y coordinates are between the font's max limits */
+ 393:cy_eink_library.c ****         if ((fontCor[CY_EINK_FONT_X] < (fontInfo->xSpan)) && 
+ 343              		.loc 1 393 0
+ 344 0008 1D78     		ldrb	r5, [r3]	@ zero_extendqisi2
+ 345 000a 167A     		ldrb	r6, [r2, #8]	@ zero_extendqisi2
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 14
+
+
+ 346 000c B542     		cmp	r5, r6
+ 347 000e 6AD2     		bcs	.L30
+ 394:cy_eink_library.c ****             (fontCor[CY_EINK_FONT_Y] < (fontInfo->ySpan)))
+ 348              		.loc 1 394 0 discriminator 1
+ 349 0010 5E78     		ldrb	r6, [r3, #1]	@ zero_extendqisi2
+ 350 0012 577A     		ldrb	r7, [r2, #9]	@ zero_extendqisi2
+ 393:cy_eink_library.c ****             (fontCor[CY_EINK_FONT_Y] < (fontInfo->ySpan)))
+ 351              		.loc 1 393 0 discriminator 1
+ 352 0014 BE42     		cmp	r6, r7
+ 353 0016 66D2     		bcs	.L30
+ 395:cy_eink_library.c ****         {
+ 396:cy_eink_library.c ****             /* Find the actual pixel location in the frame buffer where the
+ 397:cy_eink_library.c ****                pixel data should be copied */
+ 398:cy_eink_library.c ****             printLocation = (fontInfo->xOffset) + (fontCor[CY_EINK_FONT_X]   * 
+ 354              		.loc 1 398 0
+ 355 0018 1779     		ldrb	r7, [r2, #4]	@ zero_extendqisi2
+ 399:cy_eink_library.c ****                             (fontInfo->xSize))  + (((fontCor[CY_EINK_FONT_Y] * 
+ 400:cy_eink_library.c ****                             (fontInfo->ySize))  + (fontInfo->yOffset))    * 
+ 356              		.loc 1 400 0
+ 357 001a 92F807E0 		ldrb	lr, [r2, #7]	@ zero_extendqisi2
+ 358 001e 92F805C0 		ldrb	ip, [r2, #5]	@ zero_extendqisi2
+ 359 0022 0EFB06C6 		mla	r6, lr, r6, ip
+ 398:cy_eink_library.c ****                             (fontInfo->xSize))  + (((fontCor[CY_EINK_FONT_Y] * 
+ 360              		.loc 1 398 0
+ 361 0026 92F806C0 		ldrb	ip, [r2, #6]	@ zero_extendqisi2
+ 362 002a 06EB4616 		add	r6, r6, r6, lsl #5
+ 363 002e 05FB0C65 		mla	r5, r5, ip, r6
+ 364 0032 3D44     		add	r5, r5, r7
+ 365 0034 AFB2     		uxth	r7, r5
+ 366              	.LVL40:
+ 401:cy_eink_library.c ****                              PV_EINK_HORIZONTAL_SIZE);
+ 402:cy_eink_library.c ****             
+ 403:cy_eink_library.c ****             /* Check if the current character is a printable ASCII character 
+ 404:cy_eink_library.c ****                between "!" and "~" */
+ 405:cy_eink_library.c ****             if ((*currentChar <= CY_EINK_ASCII_MAX) &&
+ 367              		.loc 1 405 0
+ 368 0036 A4F12105 		sub	r5, r4, #33
+ 369 003a EDB2     		uxtb	r5, r5
+ 370 003c 5D2D     		cmp	r5, #93
+ 371 003e 4ED8     		bhi	.L44
+ 406:cy_eink_library.c ****                 (*currentChar >= CY_EINK_ASCII_MIN))
+ 407:cy_eink_library.c ****             {
+ 408:cy_eink_library.c ****                 /* Find the location of pixel data corresponding to the 
+ 409:cy_eink_library.c ****                    current character from the font array */
+ 410:cy_eink_library.c ****                 charLocation = (*currentChar - CY_EINK_ASCII_MIN) *
+ 372              		.loc 1 410 0
+ 373 0040 213C     		subs	r4, r4, #33
+ 374 0042 1EFB0CFE 		smulbb	lr, lr, ip
+ 375 0046 1EFB04FE 		smulbb	lr, lr, r4
+ 376 004a 1FFA8EFC 		uxth	ip, lr
+ 377              	.LVL41:
+ 411:cy_eink_library.c ****                                ((fontInfo->ySize) * (fontInfo->xSize));
+ 412:cy_eink_library.c ****                 
+ 413:cy_eink_library.c ****                 /* Vertical copying loop */
+ 414:cy_eink_library.c ****                 for (verticalCounter = 0; verticalCounter < (fontInfo->ySize); 
+ 378              		.loc 1 414 0
+ 379 004e 4FF0000E 		mov	lr, #0
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 15
+
+
+ 380 0052 23E0     		b	.L32
+ 381              	.LVL42:
+ 382              	.L35:
+ 415:cy_eink_library.c ****                      verticalCounter++)
+ 416:cy_eink_library.c ****                 {
+ 417:cy_eink_library.c ****                     /* Horizontal copying loop */
+ 418:cy_eink_library.c ****                     for (horizontalCounter = 0; 
+ 419:cy_eink_library.c ****                          horizontalCounter < (fontInfo->xSize); 
+ 420:cy_eink_library.c ****                          horizontalCounter++)
+ 421:cy_eink_library.c ****                     {
+ 422:cy_eink_library.c ****                         /* Calculate the current pixel data byte location of 
+ 423:cy_eink_library.c ****                            the frame buffer */
+ 424:cy_eink_library.c ****                         frameByte = horizontalCounter + (printLocation +
+ 383              		.loc 1 424 0
+ 384 0054 1FFA86F8 		uxth	r8, r6
+ 385 0058 1FFA8EF4 		uxth	r4, lr
+ 386 005c 04EB4415 		add	r5, r4, r4, lsl #5
+ 387 0060 3D44     		add	r5, r5, r7
+ 388 0062 4544     		add	r5, r5, r8
+ 389 0064 ADB2     		uxth	r5, r5
+ 390              	.LVL43:
+ 425:cy_eink_library.c ****                                     (PV_EINK_HORIZONTAL_SIZE * verticalCounter));
+ 426:cy_eink_library.c ****                         
+ 427:cy_eink_library.c ****                         /* Calculate the current pixel data byte location of 
+ 428:cy_eink_library.c ****                            the font */
+ 429:cy_eink_library.c ****                         fontByte = charLocation + (verticalCounter * 
+ 391              		.loc 1 429 0
+ 392 0066 09FB04C4 		mla	r4, r9, r4, ip
+ 393 006a 4444     		add	r4, r4, r8
+ 394 006c A4B2     		uxth	r4, r4
+ 395              	.LVL44:
+ 430:cy_eink_library.c ****                                    (fontInfo->xSize)) + horizontalCounter;
+ 431:cy_eink_library.c ****                         
+ 432:cy_eink_library.c ****                         /* Copy the pixel data as is for black font on white 
+ 433:cy_eink_library.c ****                            background */
+ 434:cy_eink_library.c ****                         if ((fontInfo->color) == CY_EINK_WHITE_BACKGROUND)
+ 396              		.loc 1 434 0
+ 397 006e 917A     		ldrb	r1, [r2, #10]	@ zero_extendqisi2
+ 398 0070 21B1     		cbz	r1, .L33
+ 435:cy_eink_library.c ****                         {
+ 436:cy_eink_library.c ****                             frameBuffer[frameByte] = ~(fontInfo->fontData
+ 437:cy_eink_library.c ****                                                                  [fontByte]);
+ 399              		.loc 1 437 0
+ 400 0072 1168     		ldr	r1, [r2]
+ 401 0074 0C5D     		ldrb	r4, [r1, r4]	@ zero_extendqisi2
+ 402              	.LVL45:
+ 436:cy_eink_library.c ****                                                                  [fontByte]);
+ 403              		.loc 1 436 0
+ 404 0076 E443     		mvns	r4, r4
+ 405 0078 4455     		strb	r4, [r0, r5]
+ 406 007a 03E0     		b	.L34
+ 407              	.LVL46:
+ 408              	.L33:
+ 438:cy_eink_library.c ****                         }
+ 439:cy_eink_library.c ****                         /* Copy the inverted pixel data for white font on black
+ 440:cy_eink_library.c ****                            background */
+ 441:cy_eink_library.c ****                         else if ((fontInfo->color) == CY_EINK_BLACK_BACKGROUND)
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 16
+
+
+ 409              		.loc 1 441 0
+ 410 007c 11B9     		cbnz	r1, .L34
+ 442:cy_eink_library.c ****                         {
+ 443:cy_eink_library.c ****                             frameBuffer[frameByte] = fontInfo->fontData
+ 444:cy_eink_library.c ****                                                               [fontByte];
+ 411              		.loc 1 444 0
+ 412 007e 1168     		ldr	r1, [r2]
+ 413 0080 0C5D     		ldrb	r4, [r1, r4]	@ zero_extendqisi2
+ 414              	.LVL47:
+ 443:cy_eink_library.c ****                                                               [fontByte];
+ 415              		.loc 1 443 0
+ 416 0082 4455     		strb	r4, [r0, r5]
+ 417              	.L34:
+ 420:cy_eink_library.c ****                     {
+ 418              		.loc 1 420 0
+ 419 0084 0136     		adds	r6, r6, #1
+ 420              	.LVL48:
+ 421 0086 F6B2     		uxtb	r6, r6
+ 422              	.LVL49:
+ 423 0088 00E0     		b	.L36
+ 424              	.LVL50:
+ 425              	.L45:
+ 426 008a 0026     		movs	r6, #0
+ 427              	.L36:
+ 428              	.LVL51:
+ 419:cy_eink_library.c ****                          horizontalCounter++)
+ 429              		.loc 1 419 0 discriminator 1
+ 430 008c 92F80690 		ldrb	r9, [r2, #6]	@ zero_extendqisi2
+ 418:cy_eink_library.c ****                          horizontalCounter < (fontInfo->xSize); 
+ 431              		.loc 1 418 0 discriminator 1
+ 432 0090 4E45     		cmp	r6, r9
+ 433 0092 DFD3     		bcc	.L35
+ 415:cy_eink_library.c ****                 {
+ 434              		.loc 1 415 0
+ 435 0094 0EF1010E 		add	lr, lr, #1
+ 436              	.LVL52:
+ 437 0098 5FFA8EFE 		uxtb	lr, lr
+ 438              	.LVL53:
+ 439              	.L32:
+ 414:cy_eink_library.c ****                      verticalCounter++)
+ 440              		.loc 1 414 0 discriminator 1
+ 441 009c D479     		ldrb	r4, [r2, #7]	@ zero_extendqisi2
+ 442 009e A645     		cmp	lr, r4
+ 443 00a0 F3D3     		bcc	.L45
+ 444 00a2 20E0     		b	.L30
+ 445              	.LVL54:
+ 446              	.L39:
+ 445:cy_eink_library.c ****                         }
+ 446:cy_eink_library.c ****                         else
+ 447:cy_eink_library.c ****                         {
+ 448:cy_eink_library.c ****                         }
+ 449:cy_eink_library.c ****                     }
+ 450:cy_eink_library.c ****                 }
+ 451:cy_eink_library.c ****             }
+ 452:cy_eink_library.c ****             /* For space and non-printable ASCII characters */
+ 453:cy_eink_library.c ****             else
+ 454:cy_eink_library.c ****             {
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 17
+
+
+ 455:cy_eink_library.c ****                 /* Vertical copying loop */
+ 456:cy_eink_library.c ****                 for (verticalCounter = 0; 
+ 457:cy_eink_library.c ****                      verticalCounter < (fontInfo->ySize); 
+ 458:cy_eink_library.c ****                      verticalCounter++)
+ 459:cy_eink_library.c ****                 {
+ 460:cy_eink_library.c ****                     /* Horizontal copying loop */
+ 461:cy_eink_library.c ****                     for (horizontalCounter = 0; 
+ 462:cy_eink_library.c ****                          horizontalCounter < (fontInfo->xSize);
+ 463:cy_eink_library.c ****                          horizontalCounter++)
+ 464:cy_eink_library.c ****                     {
+ 465:cy_eink_library.c ****                         /* Calculate the current pixel data byte location of 
+ 466:cy_eink_library.c ****                            the frame buffer */
+ 467:cy_eink_library.c ****                         frameByte = horizontalCounter + (printLocation +
+ 447              		.loc 1 467 0
+ 448 00a4 06EB4614 		add	r4, r6, r6, lsl #5
+ 449 00a8 3C44     		add	r4, r4, r7
+ 450 00aa 2C44     		add	r4, r4, r5
+ 451 00ac A4B2     		uxth	r4, r4
+ 452              	.LVL55:
+ 468:cy_eink_library.c ****                                     (PV_EINK_HORIZONTAL_SIZE * verticalCounter));
+ 469:cy_eink_library.c ****                         
+ 470:cy_eink_library.c ****                         /* Copy white pixels to create a space for fonts with 
+ 471:cy_eink_library.c ****                            white background */
+ 472:cy_eink_library.c ****                         if ((fontInfo->color) == CY_EINK_WHITE_BACKGROUND)
+ 453              		.loc 1 472 0
+ 454 00ae 92F80AE0 		ldrb	lr, [r2, #10]	@ zero_extendqisi2
+ 455 00b2 BEF1000F 		cmp	lr, #0
+ 456 00b6 04D0     		beq	.L37
+ 473:cy_eink_library.c ****                         {
+ 474:cy_eink_library.c ****                             frameBuffer[frameByte] = CY_EINK_CLEAR_TO_WHITE;
+ 457              		.loc 1 474 0
+ 458 00b8 4FF0FF0E 		mov	lr, #255
+ 459 00bc 00F804E0 		strb	lr, [r0, r4]
+ 460 00c0 03E0     		b	.L38
+ 461              	.L37:
+ 475:cy_eink_library.c ****                         }
+ 476:cy_eink_library.c ****                         /* Copy black pixels to create a space for fonts with 
+ 477:cy_eink_library.c ****                            black background */
+ 478:cy_eink_library.c ****                         else
+ 479:cy_eink_library.c ****                         {
+ 480:cy_eink_library.c ****                             frameBuffer[frameByte] = CY_EINK_CLEAR_TO_BLACK;
+ 462              		.loc 1 480 0
+ 463 00c2 4FF0000E 		mov	lr, #0
+ 464 00c6 00F804E0 		strb	lr, [r0, r4]
+ 465              	.L38:
+ 463:cy_eink_library.c ****                     {
+ 466              		.loc 1 463 0
+ 467 00ca 0135     		adds	r5, r5, #1
+ 468              	.LVL56:
+ 469 00cc EDB2     		uxtb	r5, r5
+ 470              	.LVL57:
+ 471 00ce 00E0     		b	.L40
+ 472              	.LVL58:
+ 473              	.L46:
+ 474 00d0 0025     		movs	r5, #0
+ 475              	.L40:
+ 476              	.LVL59:
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 18
+
+
+ 462:cy_eink_library.c ****                          horizontalCounter++)
+ 477              		.loc 1 462 0 discriminator 1
+ 478 00d2 9479     		ldrb	r4, [r2, #6]	@ zero_extendqisi2
+ 461:cy_eink_library.c ****                          horizontalCounter < (fontInfo->xSize);
+ 479              		.loc 1 461 0 discriminator 1
+ 480 00d4 A542     		cmp	r5, r4
+ 481 00d6 E5D3     		bcc	.L39
+ 458:cy_eink_library.c ****                 {
+ 482              		.loc 1 458 0
+ 483 00d8 0136     		adds	r6, r6, #1
+ 484              	.LVL60:
+ 485 00da F6B2     		uxtb	r6, r6
+ 486              	.LVL61:
+ 487 00dc 00E0     		b	.L31
+ 488              	.LVL62:
+ 489              	.L44:
+ 490 00de 0026     		movs	r6, #0
+ 491              	.L31:
+ 492              	.LVL63:
+ 457:cy_eink_library.c ****                      verticalCounter++)
+ 493              		.loc 1 457 0 discriminator 1
+ 494 00e0 D479     		ldrb	r4, [r2, #7]	@ zero_extendqisi2
+ 456:cy_eink_library.c ****                      verticalCounter < (fontInfo->ySize); 
+ 495              		.loc 1 456 0 discriminator 1
+ 496 00e2 A642     		cmp	r6, r4
+ 497 00e4 F4D3     		bcc	.L46
+ 498              	.LVL64:
+ 499              	.L30:
+ 481:cy_eink_library.c ****                         }
+ 482:cy_eink_library.c ****                     }
+ 483:cy_eink_library.c ****                 }
+ 484:cy_eink_library.c ****             }
+ 485:cy_eink_library.c ****         }
+ 486:cy_eink_library.c ****         /* Move on to the next character by incrementing the horizontal
+ 487:cy_eink_library.c ****            location */
+ 488:cy_eink_library.c ****         fontCor[CY_EINK_FONT_X]++;
+ 500              		.loc 1 488 0
+ 501 00e6 1C78     		ldrb	r4, [r3]	@ zero_extendqisi2
+ 502 00e8 0134     		adds	r4, r4, #1
+ 503 00ea E4B2     		uxtb	r4, r4
+ 504 00ec 1C70     		strb	r4, [r3]
+ 489:cy_eink_library.c ****         
+ 490:cy_eink_library.c ****         /* Reset the X location and increment the Y location if the X span 
+ 491:cy_eink_library.c ****            is reached */
+ 492:cy_eink_library.c ****         if (fontCor[CY_EINK_FONT_X] >= (fontInfo->xSpan))
+ 505              		.loc 1 492 0
+ 506 00ee 157A     		ldrb	r5, [r2, #8]	@ zero_extendqisi2
+ 507 00f0 AC42     		cmp	r4, r5
+ 508 00f2 04D3     		bcc	.L41
+ 493:cy_eink_library.c ****         {
+ 494:cy_eink_library.c ****             fontCor[CY_EINK_FONT_X] = 0;
+ 509              		.loc 1 494 0
+ 510 00f4 0024     		movs	r4, #0
+ 511 00f6 1C70     		strb	r4, [r3]
+ 495:cy_eink_library.c ****             fontCor[CY_EINK_FONT_Y]++;
+ 512              		.loc 1 495 0
+ 513 00f8 5C78     		ldrb	r4, [r3, #1]	@ zero_extendqisi2
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 19
+
+
+ 514 00fa 0134     		adds	r4, r4, #1
+ 515 00fc 5C70     		strb	r4, [r3, #1]
+ 516              	.L41:
+ 496:cy_eink_library.c ****         }
+ 497:cy_eink_library.c ****         /* End the function if the Y span is reached */
+ 498:cy_eink_library.c ****         if (fontCor[CY_EINK_FONT_Y] > (fontInfo->ySpan))
+ 517              		.loc 1 498 0
+ 518 00fe 5D78     		ldrb	r5, [r3, #1]	@ zero_extendqisi2
+ 519 0100 547A     		ldrb	r4, [r2, #9]	@ zero_extendqisi2
+ 520 0102 A542     		cmp	r5, r4
+ 521 0104 06D8     		bhi	.L28
+ 390:cy_eink_library.c ****     {
+ 522              		.loc 1 390 0 discriminator 2
+ 523 0106 0AF1010A 		add	r10, r10, #1
+ 524              	.LVL65:
+ 525              	.L29:
+ 390:cy_eink_library.c ****     {
+ 526              		.loc 1 390 0 is_stmt 0 discriminator 1
+ 527 010a 9AF80040 		ldrb	r4, [r10]	@ zero_extendqisi2
+ 528 010e 002C     		cmp	r4, #0
+ 529 0110 7FF47AAF 		bne	.L43
+ 530              	.L28:
+ 531 0114 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 532              		.cfi_endproc
+ 533              	.LFE653:
+ 534              		.size	Cy_EINK_TextToFrameBuffer, .-Cy_EINK_TextToFrameBuffer
+ 535              		.text
+ 536              	.Letext0:
+ 537              		.file 2 "d:\\cypress creator\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-e
+ 538              		.file 3 "d:\\cypress creator\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-e
+ 539              		.file 4 "Generated_Source\\PSoC6\\pdl\\drivers/peripheral/tcpwm/cy_tcpwm_counter.h"
+ 540              		.file 5 "Generated_Source\\PSoC6\\pdl\\drivers/peripheral/scb/cy_scb_ezi2c.h"
+ 541              		.file 6 "Generated_Source\\PSoC6\\pdl\\drivers/peripheral/scb/cy_scb_spi.h"
+ 542              		.file 7 "Generated_Source\\PSoC6\\pdl\\drivers/peripheral/scb/cy_scb_uart.h"
+ 543              		.file 8 "Generated_Source\\PSoC6\\pdl\\middleware/ble/cy_ble_stack_host_main.h"
+ 544              		.file 9 "Generated_Source\\PSoC6\\pdl\\middleware/ble/cy_ble_gap.h"
+ 545              		.file 10 "cy_eink_fonts.h"
+ 546              		.file 11 "pervasive_eink_hardware_driver.h"
+ 547              		.file 12 "cy_eink_library.h"
+ 548              		.file 13 "Generated_Source\\PSoC6\\pdl\\cmsis/include/core_cm4.h"
+ 549              		.file 14 "Generated_Source\\PSoC6/CY_EINK_SPIM.h"
+ 550              		.file 15 "Generated_Source\\PSoC6/CY_EINK_Timer.h"
+ 551              		.file 16 "Generated_Source\\PSoC6/Uart_Printf.h"
+ 552              		.file 17 "Generated_Source\\PSoC6/I2C.h"
+ 553              		.section	.debug_info,"",%progbits
+ 554              	.Ldebug_info0:
+ 555 0000 FF0A0000 		.4byte	0xaff
+ 556 0004 0400     		.2byte	0x4
+ 557 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 558 000a 04       		.byte	0x4
+ 559 000b 01       		.uleb128 0x1
+ 560 000c 0D060000 		.4byte	.LASF181
+ 561 0010 0C       		.byte	0xc
+ 562 0011 7C080000 		.4byte	.LASF182
+ 563 0015 26090000 		.4byte	.LASF183
+ 564 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 565 001d 00000000 		.4byte	0
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 20
+
+
+ 566 0021 00000000 		.4byte	.Ldebug_line0
+ 567 0025 02       		.uleb128 0x2
+ 568 0026 52010000 		.4byte	.LASF0
+ 569 002a 02       		.byte	0x2
+ 570 002b 1B       		.byte	0x1b
+ 571 002c 30000000 		.4byte	0x30
+ 572 0030 03       		.uleb128 0x3
+ 573 0031 01       		.byte	0x1
+ 574 0032 06       		.byte	0x6
+ 575 0033 E70B0000 		.4byte	.LASF2
+ 576 0037 02       		.uleb128 0x2
+ 577 0038 8B000000 		.4byte	.LASF1
+ 578 003c 02       		.byte	0x2
+ 579 003d 1D       		.byte	0x1d
+ 580 003e 42000000 		.4byte	0x42
+ 581 0042 03       		.uleb128 0x3
+ 582 0043 01       		.byte	0x1
+ 583 0044 08       		.byte	0x8
+ 584 0045 A9070000 		.4byte	.LASF3
+ 585 0049 03       		.uleb128 0x3
+ 586 004a 02       		.byte	0x2
+ 587 004b 05       		.byte	0x5
+ 588 004c 7E020000 		.4byte	.LASF4
+ 589 0050 02       		.uleb128 0x2
+ 590 0051 12090000 		.4byte	.LASF5
+ 591 0055 02       		.byte	0x2
+ 592 0056 2B       		.byte	0x2b
+ 593 0057 5B000000 		.4byte	0x5b
+ 594 005b 03       		.uleb128 0x3
+ 595 005c 02       		.byte	0x2
+ 596 005d 07       		.byte	0x7
+ 597 005e EE030000 		.4byte	.LASF6
+ 598 0062 02       		.uleb128 0x2
+ 599 0063 C2040000 		.4byte	.LASF7
+ 600 0067 02       		.byte	0x2
+ 601 0068 3F       		.byte	0x3f
+ 602 0069 6D000000 		.4byte	0x6d
+ 603 006d 03       		.uleb128 0x3
+ 604 006e 04       		.byte	0x4
+ 605 006f 05       		.byte	0x5
+ 606 0070 CB000000 		.4byte	.LASF8
+ 607 0074 02       		.uleb128 0x2
+ 608 0075 23030000 		.4byte	.LASF9
+ 609 0079 02       		.byte	0x2
+ 610 007a 41       		.byte	0x41
+ 611 007b 7F000000 		.4byte	0x7f
+ 612 007f 03       		.uleb128 0x3
+ 613 0080 04       		.byte	0x4
+ 614 0081 07       		.byte	0x7
+ 615 0082 DD010000 		.4byte	.LASF10
+ 616 0086 03       		.uleb128 0x3
+ 617 0087 08       		.byte	0x8
+ 618 0088 05       		.byte	0x5
+ 619 0089 80010000 		.4byte	.LASF11
+ 620 008d 03       		.uleb128 0x3
+ 621 008e 08       		.byte	0x8
+ 622 008f 07       		.byte	0x7
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 21
+
+
+ 623 0090 F4000000 		.4byte	.LASF12
+ 624 0094 04       		.uleb128 0x4
+ 625 0095 04       		.byte	0x4
+ 626 0096 05       		.byte	0x5
+ 627 0097 696E7400 		.ascii	"int\000"
+ 628 009b 03       		.uleb128 0x3
+ 629 009c 04       		.byte	0x4
+ 630 009d 07       		.byte	0x7
+ 631 009e 8D030000 		.4byte	.LASF13
+ 632 00a2 03       		.uleb128 0x3
+ 633 00a3 08       		.byte	0x8
+ 634 00a4 04       		.byte	0x4
+ 635 00a5 3E050000 		.4byte	.LASF14
+ 636 00a9 05       		.uleb128 0x5
+ 637 00aa 04       		.byte	0x4
+ 638 00ab 03       		.uleb128 0x3
+ 639 00ac 04       		.byte	0x4
+ 640 00ad 07       		.byte	0x7
+ 641 00ae 35050000 		.4byte	.LASF15
+ 642 00b2 06       		.uleb128 0x6
+ 643 00b3 04       		.byte	0x4
+ 644 00b4 B8000000 		.4byte	0xb8
+ 645 00b8 03       		.uleb128 0x3
+ 646 00b9 01       		.byte	0x1
+ 647 00ba 08       		.byte	0x8
+ 648 00bb DF080000 		.4byte	.LASF16
+ 649 00bf 02       		.uleb128 0x2
+ 650 00c0 330A0000 		.4byte	.LASF17
+ 651 00c4 03       		.byte	0x3
+ 652 00c5 14       		.byte	0x14
+ 653 00c6 25000000 		.4byte	0x25
+ 654 00ca 02       		.uleb128 0x2
+ 655 00cb 1A0B0000 		.4byte	.LASF18
+ 656 00cf 03       		.byte	0x3
+ 657 00d0 18       		.byte	0x18
+ 658 00d1 37000000 		.4byte	0x37
+ 659 00d5 02       		.uleb128 0x2
+ 660 00d6 88020000 		.4byte	.LASF19
+ 661 00da 03       		.byte	0x3
+ 662 00db 24       		.byte	0x24
+ 663 00dc 50000000 		.4byte	0x50
+ 664 00e0 02       		.uleb128 0x2
+ 665 00e1 A1070000 		.4byte	.LASF20
+ 666 00e5 03       		.byte	0x3
+ 667 00e6 2C       		.byte	0x2c
+ 668 00e7 62000000 		.4byte	0x62
+ 669 00eb 02       		.uleb128 0x2
+ 670 00ec 73080000 		.4byte	.LASF21
+ 671 00f0 03       		.byte	0x3
+ 672 00f1 30       		.byte	0x30
+ 673 00f2 74000000 		.4byte	0x74
+ 674 00f6 07       		.uleb128 0x7
+ 675 00f7 EB000000 		.4byte	0xeb
+ 676 00fb 03       		.uleb128 0x3
+ 677 00fc 04       		.byte	0x4
+ 678 00fd 04       		.byte	0x4
+ 679 00fe F2060000 		.4byte	.LASF22
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 22
+
+
+ 680 0102 03       		.uleb128 0x3
+ 681 0103 08       		.byte	0x8
+ 682 0104 04       		.byte	0x4
+ 683 0105 91020000 		.4byte	.LASF23
+ 684 0109 03       		.uleb128 0x3
+ 685 010a 01       		.byte	0x1
+ 686 010b 02       		.byte	0x2
+ 687 010c 640A0000 		.4byte	.LASF24
+ 688 0110 08       		.uleb128 0x8
+ 689 0111 00050000 		.4byte	.LASF56
+ 690 0115 4C       		.byte	0x4c
+ 691 0116 04       		.byte	0x4
+ 692 0117 2B       		.byte	0x2b
+ 693 0118 01020000 		.4byte	0x201
+ 694 011c 09       		.uleb128 0x9
+ 695 011d D4000000 		.4byte	.LASF25
+ 696 0121 04       		.byte	0x4
+ 697 0122 2D       		.byte	0x2d
+ 698 0123 EB000000 		.4byte	0xeb
+ 699 0127 00       		.byte	0
+ 700 0128 09       		.uleb128 0x9
+ 701 0129 24010000 		.4byte	.LASF26
+ 702 012d 04       		.byte	0x4
+ 703 012e 2F       		.byte	0x2f
+ 704 012f EB000000 		.4byte	0xeb
+ 705 0133 04       		.byte	0x4
+ 706 0134 09       		.uleb128 0x9
+ 707 0135 00000000 		.4byte	.LASF27
+ 708 0139 04       		.byte	0x4
+ 709 013a 30       		.byte	0x30
+ 710 013b EB000000 		.4byte	0xeb
+ 711 013f 08       		.byte	0x8
+ 712 0140 09       		.uleb128 0x9
+ 713 0141 AE000000 		.4byte	.LASF28
+ 714 0145 04       		.byte	0x4
+ 715 0146 31       		.byte	0x31
+ 716 0147 EB000000 		.4byte	0xeb
+ 717 014b 0C       		.byte	0xc
+ 718 014c 09       		.uleb128 0x9
+ 719 014d 25080000 		.4byte	.LASF29
+ 720 0151 04       		.byte	0x4
+ 721 0152 33       		.byte	0x33
+ 722 0153 EB000000 		.4byte	0xeb
+ 723 0157 10       		.byte	0x10
+ 724 0158 09       		.uleb128 0x9
+ 725 0159 C5080000 		.4byte	.LASF30
+ 726 015d 04       		.byte	0x4
+ 727 015e 34       		.byte	0x34
+ 728 015f EB000000 		.4byte	0xeb
+ 729 0163 14       		.byte	0x14
+ 730 0164 09       		.uleb128 0x9
+ 731 0165 CE080000 		.4byte	.LASF31
+ 732 0169 04       		.byte	0x4
+ 733 016a 35       		.byte	0x35
+ 734 016b EB000000 		.4byte	0xeb
+ 735 016f 18       		.byte	0x18
+ 736 0170 09       		.uleb128 0x9
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 23
+
+
+ 737 0171 DE070000 		.4byte	.LASF32
+ 738 0175 04       		.byte	0x4
+ 739 0176 36       		.byte	0x36
+ 740 0177 09010000 		.4byte	0x109
+ 741 017b 1C       		.byte	0x1c
+ 742 017c 09       		.uleb128 0x9
+ 743 017d 90090000 		.4byte	.LASF33
+ 744 0181 04       		.byte	0x4
+ 745 0182 38       		.byte	0x38
+ 746 0183 EB000000 		.4byte	0xeb
+ 747 0187 20       		.byte	0x20
+ 748 0188 09       		.uleb128 0x9
+ 749 0189 B4020000 		.4byte	.LASF34
+ 750 018d 04       		.byte	0x4
+ 751 018e 39       		.byte	0x39
+ 752 018f EB000000 		.4byte	0xeb
+ 753 0193 24       		.byte	0x24
+ 754 0194 09       		.uleb128 0x9
+ 755 0195 E7000000 		.4byte	.LASF35
+ 756 0199 04       		.byte	0x4
+ 757 019a 3B       		.byte	0x3b
+ 758 019b EB000000 		.4byte	0xeb
+ 759 019f 28       		.byte	0x28
+ 760 01a0 09       		.uleb128 0x9
+ 761 01a1 730B0000 		.4byte	.LASF36
+ 762 01a5 04       		.byte	0x4
+ 763 01a6 3C       		.byte	0x3c
+ 764 01a7 EB000000 		.4byte	0xeb
+ 765 01ab 2C       		.byte	0x2c
+ 766 01ac 09       		.uleb128 0x9
+ 767 01ad A1090000 		.4byte	.LASF37
+ 768 01b1 04       		.byte	0x4
+ 769 01b2 3E       		.byte	0x3e
+ 770 01b3 EB000000 		.4byte	0xeb
+ 771 01b7 30       		.byte	0x30
+ 772 01b8 09       		.uleb128 0x9
+ 773 01b9 92070000 		.4byte	.LASF38
+ 774 01bd 04       		.byte	0x4
+ 775 01be 3F       		.byte	0x3f
+ 776 01bf EB000000 		.4byte	0xeb
+ 777 01c3 34       		.byte	0x34
+ 778 01c4 09       		.uleb128 0x9
+ 779 01c5 EF040000 		.4byte	.LASF39
+ 780 01c9 04       		.byte	0x4
+ 781 01ca 41       		.byte	0x41
+ 782 01cb EB000000 		.4byte	0xeb
+ 783 01cf 38       		.byte	0x38
+ 784 01d0 09       		.uleb128 0x9
+ 785 01d1 BD000000 		.4byte	.LASF40
+ 786 01d5 04       		.byte	0x4
+ 787 01d6 42       		.byte	0x42
+ 788 01d7 EB000000 		.4byte	0xeb
+ 789 01db 3C       		.byte	0x3c
+ 790 01dc 09       		.uleb128 0x9
+ 791 01dd 130A0000 		.4byte	.LASF41
+ 792 01e1 04       		.byte	0x4
+ 793 01e2 44       		.byte	0x44
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 24
+
+
+ 794 01e3 EB000000 		.4byte	0xeb
+ 795 01e7 40       		.byte	0x40
+ 796 01e8 09       		.uleb128 0x9
+ 797 01e9 E0040000 		.4byte	.LASF42
+ 798 01ed 04       		.byte	0x4
+ 799 01ee 45       		.byte	0x45
+ 800 01ef EB000000 		.4byte	0xeb
+ 801 01f3 44       		.byte	0x44
+ 802 01f4 09       		.uleb128 0x9
+ 803 01f5 56020000 		.4byte	.LASF43
+ 804 01f9 04       		.byte	0x4
+ 805 01fa 47       		.byte	0x47
+ 806 01fb EB000000 		.4byte	0xeb
+ 807 01ff 48       		.byte	0x48
+ 808 0200 00       		.byte	0
+ 809 0201 02       		.uleb128 0x2
+ 810 0202 8E010000 		.4byte	.LASF44
+ 811 0206 04       		.byte	0x4
+ 812 0207 48       		.byte	0x48
+ 813 0208 10010000 		.4byte	0x110
+ 814 020c 06       		.uleb128 0x6
+ 815 020d 04       		.byte	0x4
+ 816 020e 12020000 		.4byte	0x212
+ 817 0212 0A       		.uleb128 0xa
+ 818 0213 1D020000 		.4byte	0x21d
+ 819 0217 0B       		.uleb128 0xb
+ 820 0218 EB000000 		.4byte	0xeb
+ 821 021c 00       		.byte	0
+ 822 021d 06       		.uleb128 0x6
+ 823 021e 04       		.byte	0x4
+ 824 021f CA000000 		.4byte	0xca
+ 825 0223 0C       		.uleb128 0xc
+ 826 0224 01       		.byte	0x1
+ 827 0225 42000000 		.4byte	0x42
+ 828 0229 05       		.byte	0x5
+ 829 022a 2A01     		.2byte	0x12a
+ 830 022c 3D020000 		.4byte	0x23d
+ 831 0230 0D       		.uleb128 0xd
+ 832 0231 480A0000 		.4byte	.LASF45
+ 833 0235 00       		.byte	0
+ 834 0236 0D       		.uleb128 0xd
+ 835 0237 F6090000 		.4byte	.LASF46
+ 836 023b 01       		.byte	0x1
+ 837 023c 00       		.byte	0
+ 838 023d 0E       		.uleb128 0xe
+ 839 023e 28000000 		.4byte	.LASF47
+ 840 0242 05       		.byte	0x5
+ 841 0243 2D01     		.2byte	0x12d
+ 842 0245 23020000 		.4byte	0x223
+ 843 0249 0C       		.uleb128 0xc
+ 844 024a 01       		.byte	0x1
+ 845 024b 42000000 		.4byte	0x42
+ 846 024f 05       		.byte	0x5
+ 847 0250 3201     		.2byte	0x132
+ 848 0252 81020000 		.4byte	0x281
+ 849 0256 0D       		.uleb128 0xd
+ 850 0257 8C050000 		.4byte	.LASF48
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 25
+
+
+ 851 025b 00       		.byte	0
+ 852 025c 0D       		.uleb128 0xd
+ 853 025d 01040000 		.4byte	.LASF49
+ 854 0261 01       		.byte	0x1
+ 855 0262 0D       		.uleb128 0xd
+ 856 0263 EF020000 		.4byte	.LASF50
+ 857 0267 02       		.byte	0x2
+ 858 0268 0D       		.uleb128 0xd
+ 859 0269 220B0000 		.4byte	.LASF51
+ 860 026d 03       		.byte	0x3
+ 861 026e 0D       		.uleb128 0xd
+ 862 026f D5050000 		.4byte	.LASF52
+ 863 0273 04       		.byte	0x4
+ 864 0274 0D       		.uleb128 0xd
+ 865 0275 F1050000 		.4byte	.LASF53
+ 866 0279 05       		.byte	0x5
+ 867 027a 0D       		.uleb128 0xd
+ 868 027b F1080000 		.4byte	.LASF54
+ 869 027f 06       		.byte	0x6
+ 870 0280 00       		.byte	0
+ 871 0281 0E       		.uleb128 0xe
+ 872 0282 18070000 		.4byte	.LASF55
+ 873 0286 05       		.byte	0x5
+ 874 0287 3A01     		.2byte	0x13a
+ 875 0289 49020000 		.4byte	0x249
+ 876 028d 0F       		.uleb128 0xf
+ 877 028e 5B030000 		.4byte	.LASF57
+ 878 0292 3C       		.byte	0x3c
+ 879 0293 05       		.byte	0x5
+ 880 0294 6601     		.2byte	0x166
+ 881 0296 78030000 		.4byte	0x378
+ 882 029a 10       		.uleb128 0x10
+ 883 029b 50020000 		.4byte	.LASF58
+ 884 029f 05       		.byte	0x5
+ 885 02a0 6901     		.2byte	0x169
+ 886 02a2 78030000 		.4byte	0x378
+ 887 02a6 00       		.byte	0
+ 888 02a7 10       		.uleb128 0x10
+ 889 02a8 15080000 		.4byte	.LASF59
+ 890 02ac 05       		.byte	0x5
+ 891 02ad 6A01     		.2byte	0x16a
+ 892 02af F6000000 		.4byte	0xf6
+ 893 02b3 04       		.byte	0x4
+ 894 02b4 10       		.uleb128 0x10
+ 895 02b5 2D020000 		.4byte	.LASF60
+ 896 02b9 05       		.byte	0x5
+ 897 02ba 6C01     		.2byte	0x16c
+ 898 02bc CA000000 		.4byte	0xca
+ 899 02c0 08       		.byte	0x8
+ 900 02c1 10       		.uleb128 0x10
+ 901 02c2 36020000 		.4byte	.LASF61
+ 902 02c6 05       		.byte	0x5
+ 903 02c7 6D01     		.2byte	0x16d
+ 904 02c9 CA000000 		.4byte	0xca
+ 905 02cd 09       		.byte	0x9
+ 906 02ce 10       		.uleb128 0x10
+ 907 02cf 6A010000 		.4byte	.LASF62
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 26
+
+
+ 908 02d3 05       		.byte	0x5
+ 909 02d4 6E01     		.2byte	0x16e
+ 910 02d6 3D020000 		.4byte	0x23d
+ 911 02da 0A       		.byte	0xa
+ 912 02db 11       		.uleb128 0x11
+ 913 02dc 69647800 		.ascii	"idx\000"
+ 914 02e0 05       		.byte	0x5
+ 915 02e1 7001     		.2byte	0x170
+ 916 02e3 EB000000 		.4byte	0xeb
+ 917 02e7 0C       		.byte	0xc
+ 918 02e8 10       		.uleb128 0x10
+ 919 02e9 F30B0000 		.4byte	.LASF63
+ 920 02ed 05       		.byte	0x5
+ 921 02ee 7101     		.2byte	0x171
+ 922 02f0 EB000000 		.4byte	0xeb
+ 923 02f4 10       		.byte	0x10
+ 924 02f5 10       		.uleb128 0x10
+ 925 02f6 FD0B0000 		.4byte	.LASF64
+ 926 02fa 05       		.byte	0x5
+ 927 02fb 7201     		.2byte	0x172
+ 928 02fd EB000000 		.4byte	0xeb
+ 929 0301 14       		.byte	0x14
+ 930 0302 10       		.uleb128 0x10
+ 931 0303 8E080000 		.4byte	.LASF65
+ 932 0307 05       		.byte	0x5
+ 933 0308 7401     		.2byte	0x174
+ 934 030a 09010000 		.4byte	0x109
+ 935 030e 18       		.byte	0x18
+ 936 030f 10       		.uleb128 0x10
+ 937 0310 49020000 		.4byte	.LASF66
+ 938 0314 05       		.byte	0x5
+ 939 0315 7501     		.2byte	0x175
+ 940 0317 1D020000 		.4byte	0x21d
+ 941 031b 1C       		.byte	0x1c
+ 942 031c 10       		.uleb128 0x10
+ 943 031d D7080000 		.4byte	.LASF67
+ 944 0321 05       		.byte	0x5
+ 945 0322 7601     		.2byte	0x176
+ 946 0324 EB000000 		.4byte	0xeb
+ 947 0328 20       		.byte	0x20
+ 948 0329 10       		.uleb128 0x10
+ 949 032a 86000000 		.4byte	.LASF68
+ 950 032e 05       		.byte	0x5
+ 951 032f 7801     		.2byte	0x178
+ 952 0331 1D020000 		.4byte	0x21d
+ 953 0335 24       		.byte	0x24
+ 954 0336 10       		.uleb128 0x10
+ 955 0337 F0070000 		.4byte	.LASF69
+ 956 033b 05       		.byte	0x5
+ 957 033c 7901     		.2byte	0x179
+ 958 033e EB000000 		.4byte	0xeb
+ 959 0342 28       		.byte	0x28
+ 960 0343 10       		.uleb128 0x10
+ 961 0344 AA0B0000 		.4byte	.LASF70
+ 962 0348 05       		.byte	0x5
+ 963 0349 7A01     		.2byte	0x17a
+ 964 034b EB000000 		.4byte	0xeb
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 27
+
+
+ 965 034f 2C       		.byte	0x2c
+ 966 0350 10       		.uleb128 0x10
+ 967 0351 BB0A0000 		.4byte	.LASF71
+ 968 0355 05       		.byte	0x5
+ 969 0356 7C01     		.2byte	0x17c
+ 970 0358 1D020000 		.4byte	0x21d
+ 971 035c 30       		.byte	0x30
+ 972 035d 10       		.uleb128 0x10
+ 973 035e 84030000 		.4byte	.LASF72
+ 974 0362 05       		.byte	0x5
+ 975 0363 7D01     		.2byte	0x17d
+ 976 0365 EB000000 		.4byte	0xeb
+ 977 0369 34       		.byte	0x34
+ 978 036a 10       		.uleb128 0x10
+ 979 036b B6030000 		.4byte	.LASF73
+ 980 036f 05       		.byte	0x5
+ 981 0370 7E01     		.2byte	0x17e
+ 982 0372 EB000000 		.4byte	0xeb
+ 983 0376 38       		.byte	0x38
+ 984 0377 00       		.byte	0
+ 985 0378 07       		.uleb128 0x7
+ 986 0379 81020000 		.4byte	0x281
+ 987 037d 0E       		.uleb128 0xe
+ 988 037e 580B0000 		.4byte	.LASF74
+ 989 0382 05       		.byte	0x5
+ 990 0383 8001     		.2byte	0x180
+ 991 0385 8D020000 		.4byte	0x28d
+ 992 0389 0E       		.uleb128 0xe
+ 993 038a 0F020000 		.4byte	.LASF75
+ 994 038e 06       		.byte	0x6
+ 995 038f BF01     		.2byte	0x1bf
+ 996 0391 0C020000 		.4byte	0x20c
+ 997 0395 0F       		.uleb128 0xf
+ 998 0396 AC010000 		.4byte	.LASF76
+ 999 039a 24       		.byte	0x24
+ 1000 039b 06       		.byte	0x6
+ 1001 039c 4102     		.2byte	0x241
+ 1002 039e 18040000 		.4byte	0x418
+ 1003 03a2 10       		.uleb128 0x10
+ 1004 03a3 15080000 		.4byte	.LASF59
+ 1005 03a7 06       		.byte	0x6
+ 1006 03a8 4402     		.2byte	0x244
+ 1007 03aa F6000000 		.4byte	0xf6
+ 1008 03ae 00       		.byte	0
+ 1009 03af 10       		.uleb128 0x10
+ 1010 03b0 420A0000 		.4byte	.LASF77
+ 1011 03b4 06       		.byte	0x6
+ 1012 03b5 4602     		.2byte	0x246
+ 1013 03b7 A9000000 		.4byte	0xa9
+ 1014 03bb 04       		.byte	0x4
+ 1015 03bc 10       		.uleb128 0x10
+ 1016 03bd 10000000 		.4byte	.LASF78
+ 1017 03c1 06       		.byte	0x6
+ 1018 03c2 4702     		.2byte	0x247
+ 1019 03c4 EB000000 		.4byte	0xeb
+ 1020 03c8 08       		.byte	0x8
+ 1021 03c9 10       		.uleb128 0x10
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 28
+
+
+ 1022 03ca 42030000 		.4byte	.LASF79
+ 1023 03ce 06       		.byte	0x6
+ 1024 03cf 4802     		.2byte	0x248
+ 1025 03d1 F6000000 		.4byte	0xf6
+ 1026 03d5 0C       		.byte	0xc
+ 1027 03d6 10       		.uleb128 0x10
+ 1028 03d7 5B010000 		.4byte	.LASF80
+ 1029 03db 06       		.byte	0x6
+ 1030 03dc 4A02     		.2byte	0x24a
+ 1031 03de A9000000 		.4byte	0xa9
+ 1032 03e2 10       		.byte	0x10
+ 1033 03e3 10       		.uleb128 0x10
+ 1034 03e4 7A030000 		.4byte	.LASF81
+ 1035 03e8 06       		.byte	0x6
+ 1036 03e9 4B02     		.2byte	0x24b
+ 1037 03eb EB000000 		.4byte	0xeb
+ 1038 03ef 14       		.byte	0x14
+ 1039 03f0 10       		.uleb128 0x10
+ 1040 03f1 1C080000 		.4byte	.LASF82
+ 1041 03f5 06       		.byte	0x6
+ 1042 03f6 4C02     		.2byte	0x24c
+ 1043 03f8 F6000000 		.4byte	0xf6
+ 1044 03fc 18       		.byte	0x18
+ 1045 03fd 10       		.uleb128 0x10
+ 1046 03fe 59040000 		.4byte	.LASF83
+ 1047 0402 06       		.byte	0x6
+ 1048 0403 5202     		.2byte	0x252
+ 1049 0405 89030000 		.4byte	0x389
+ 1050 0409 1C       		.byte	0x1c
+ 1051 040a 10       		.uleb128 0x10
+ 1052 040b 3A0A0000 		.4byte	.LASF84
+ 1053 040f 06       		.byte	0x6
+ 1054 0410 5502     		.2byte	0x255
+ 1055 0412 EB000000 		.4byte	0xeb
+ 1056 0416 20       		.byte	0x20
+ 1057 0417 00       		.byte	0
+ 1058 0418 0E       		.uleb128 0xe
+ 1059 0419 AC080000 		.4byte	.LASF85
+ 1060 041d 06       		.byte	0x6
+ 1061 041e 5802     		.2byte	0x258
+ 1062 0420 95030000 		.4byte	0x395
+ 1063 0424 0E       		.uleb128 0xe
+ 1064 0425 D7090000 		.4byte	.LASF86
+ 1065 0429 07       		.byte	0x7
+ 1066 042a AB01     		.2byte	0x1ab
+ 1067 042c 0C020000 		.4byte	0x20c
+ 1068 0430 0F       		.uleb128 0xf
+ 1069 0431 180C0000 		.4byte	.LASF87
+ 1070 0435 38       		.byte	0x38
+ 1071 0436 07       		.byte	0x7
+ 1072 0437 4702     		.2byte	0x247
+ 1073 0439 F4040000 		.4byte	0x4f4
+ 1074 043d 10       		.uleb128 0x10
+ 1075 043e DE0B0000 		.4byte	.LASF88
+ 1076 0442 07       		.byte	0x7
+ 1077 0443 4A02     		.2byte	0x24a
+ 1078 0445 F6000000 		.4byte	0xf6
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 29
+
+
+ 1079 0449 00       		.byte	0
+ 1080 044a 10       		.uleb128 0x10
+ 1081 044b CC050000 		.4byte	.LASF89
+ 1082 044f 07       		.byte	0x7
+ 1083 0450 4B02     		.2byte	0x24b
+ 1084 0452 F6000000 		.4byte	0xf6
+ 1085 0456 04       		.byte	0x4
+ 1086 0457 10       		.uleb128 0x10
+ 1087 0458 33010000 		.4byte	.LASF90
+ 1088 045c 07       		.byte	0x7
+ 1089 045d 4D02     		.2byte	0x24d
+ 1090 045f A9000000 		.4byte	0xa9
+ 1091 0463 08       		.byte	0x8
+ 1092 0464 10       		.uleb128 0x10
+ 1093 0465 1D0A0000 		.4byte	.LASF91
+ 1094 0469 07       		.byte	0x7
+ 1095 046a 4E02     		.2byte	0x24e
+ 1096 046c EB000000 		.4byte	0xeb
+ 1097 0470 0C       		.byte	0xc
+ 1098 0471 10       		.uleb128 0x10
+ 1099 0472 CC040000 		.4byte	.LASF92
+ 1100 0476 07       		.byte	0x7
+ 1101 0477 4F02     		.2byte	0x24f
+ 1102 0479 F6000000 		.4byte	0xf6
+ 1103 047d 10       		.byte	0x10
+ 1104 047e 10       		.uleb128 0x10
+ 1105 047f 9C0B0000 		.4byte	.LASF93
+ 1106 0483 07       		.byte	0x7
+ 1107 0484 5002     		.2byte	0x250
+ 1108 0486 F6000000 		.4byte	0xf6
+ 1109 048a 14       		.byte	0x14
+ 1110 048b 10       		.uleb128 0x10
+ 1111 048c 420A0000 		.4byte	.LASF77
+ 1112 0490 07       		.byte	0x7
+ 1113 0491 5202     		.2byte	0x252
+ 1114 0493 A9000000 		.4byte	0xa9
+ 1115 0497 18       		.byte	0x18
+ 1116 0498 10       		.uleb128 0x10
+ 1117 0499 10000000 		.4byte	.LASF78
+ 1118 049d 07       		.byte	0x7
+ 1119 049e 5302     		.2byte	0x253
+ 1120 04a0 EB000000 		.4byte	0xeb
+ 1121 04a4 1C       		.byte	0x1c
+ 1122 04a5 10       		.uleb128 0x10
+ 1123 04a6 42030000 		.4byte	.LASF79
+ 1124 04aa 07       		.byte	0x7
+ 1125 04ab 5402     		.2byte	0x254
+ 1126 04ad F6000000 		.4byte	0xf6
+ 1127 04b1 20       		.byte	0x20
+ 1128 04b2 10       		.uleb128 0x10
+ 1129 04b3 5B010000 		.4byte	.LASF80
+ 1130 04b7 07       		.byte	0x7
+ 1131 04b8 5602     		.2byte	0x256
+ 1132 04ba A9000000 		.4byte	0xa9
+ 1133 04be 24       		.byte	0x24
+ 1134 04bf 10       		.uleb128 0x10
+ 1135 04c0 7A030000 		.4byte	.LASF81
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 30
+
+
+ 1136 04c4 07       		.byte	0x7
+ 1137 04c5 5702     		.2byte	0x257
+ 1138 04c7 EB000000 		.4byte	0xeb
+ 1139 04cb 28       		.byte	0x28
+ 1140 04cc 10       		.uleb128 0x10
+ 1141 04cd 07070000 		.4byte	.LASF94
+ 1142 04d1 07       		.byte	0x7
+ 1143 04d2 5802     		.2byte	0x258
+ 1144 04d4 F6000000 		.4byte	0xf6
+ 1145 04d8 2C       		.byte	0x2c
+ 1146 04d9 10       		.uleb128 0x10
+ 1147 04da 59040000 		.4byte	.LASF83
+ 1148 04de 07       		.byte	0x7
+ 1149 04df 5D02     		.2byte	0x25d
+ 1150 04e1 24040000 		.4byte	0x424
+ 1151 04e5 30       		.byte	0x30
+ 1152 04e6 10       		.uleb128 0x10
+ 1153 04e7 3A0A0000 		.4byte	.LASF84
+ 1154 04eb 07       		.byte	0x7
+ 1155 04ec 6002     		.2byte	0x260
+ 1156 04ee EB000000 		.4byte	0xeb
+ 1157 04f2 34       		.byte	0x34
+ 1158 04f3 00       		.byte	0
+ 1159 04f4 0E       		.uleb128 0xe
+ 1160 04f5 C3010000 		.4byte	.LASF95
+ 1161 04f9 07       		.byte	0x7
+ 1162 04fa 6302     		.2byte	0x263
+ 1163 04fc 30040000 		.4byte	0x430
+ 1164 0500 12       		.uleb128 0x12
+ 1165 0501 02       		.byte	0x2
+ 1166 0502 08       		.byte	0x8
+ 1167 0503 5B01     		.2byte	0x15b
+ 1168 0505 24050000 		.4byte	0x524
+ 1169 0509 10       		.uleb128 0x10
+ 1170 050a D50B0000 		.4byte	.LASF96
+ 1171 050e 08       		.byte	0x8
+ 1172 050f 6501     		.2byte	0x165
+ 1173 0511 CA000000 		.4byte	0xca
+ 1174 0515 00       		.byte	0
+ 1175 0516 10       		.uleb128 0x10
+ 1176 0517 FA040000 		.4byte	.LASF97
+ 1177 051b 08       		.byte	0x8
+ 1178 051c 6901     		.2byte	0x169
+ 1179 051e CA000000 		.4byte	0xca
+ 1180 0522 01       		.byte	0x1
+ 1181 0523 00       		.byte	0
+ 1182 0524 0E       		.uleb128 0xe
+ 1183 0525 95000000 		.4byte	.LASF98
+ 1184 0529 08       		.byte	0x8
+ 1185 052a 6B01     		.2byte	0x16b
+ 1186 052c 00050000 		.4byte	0x500
+ 1187 0530 13       		.uleb128 0x13
+ 1188 0531 01       		.byte	0x1
+ 1189 0532 42000000 		.4byte	0x42
+ 1190 0536 09       		.byte	0x9
+ 1191 0537 7E       		.byte	0x7e
+ 1192 0538 55050000 		.4byte	0x555
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 31
+
+
+ 1193 053c 0D       		.uleb128 0xd
+ 1194 053d 010B0000 		.4byte	.LASF99
+ 1195 0541 00       		.byte	0
+ 1196 0542 0D       		.uleb128 0xd
+ 1197 0543 6D050000 		.4byte	.LASF100
+ 1198 0547 01       		.byte	0x1
+ 1199 0548 0D       		.uleb128 0xd
+ 1200 0549 E40A0000 		.4byte	.LASF101
+ 1201 054d 02       		.byte	0x2
+ 1202 054e 0D       		.uleb128 0xd
+ 1203 054f EF010000 		.4byte	.LASF102
+ 1204 0553 03       		.byte	0x3
+ 1205 0554 00       		.byte	0
+ 1206 0555 02       		.uleb128 0x2
+ 1207 0556 61020000 		.4byte	.LASF103
+ 1208 055a 09       		.byte	0x9
+ 1209 055b 83       		.byte	0x83
+ 1210 055c 30050000 		.4byte	0x530
+ 1211 0560 13       		.uleb128 0x13
+ 1212 0561 01       		.byte	0x1
+ 1213 0562 42000000 		.4byte	0x42
+ 1214 0566 09       		.byte	0x9
+ 1215 0567 87       		.byte	0x87
+ 1216 0568 9D050000 		.4byte	0x59d
+ 1217 056c 0D       		.uleb128 0xd
+ 1218 056d 6A0A0000 		.4byte	.LASF104
+ 1219 0571 00       		.byte	0
+ 1220 0572 0D       		.uleb128 0xd
+ 1221 0573 3E0C0000 		.4byte	.LASF105
+ 1222 0577 01       		.byte	0x1
+ 1223 0578 0D       		.uleb128 0xd
+ 1224 0579 9A030000 		.4byte	.LASF106
+ 1225 057d 02       		.byte	0x2
+ 1226 057e 0D       		.uleb128 0xd
+ 1227 057f AD090000 		.4byte	.LASF107
+ 1228 0583 03       		.byte	0x3
+ 1229 0584 0D       		.uleb128 0xd
+ 1230 0585 C5020000 		.4byte	.LASF108
+ 1231 0589 04       		.byte	0x4
+ 1232 058a 0D       		.uleb128 0xd
+ 1233 058b 68070000 		.4byte	.LASF109
+ 1234 058f 05       		.byte	0x5
+ 1235 0590 0D       		.uleb128 0xd
+ 1236 0591 36080000 		.4byte	.LASF110
+ 1237 0595 06       		.byte	0x6
+ 1238 0596 0D       		.uleb128 0xd
+ 1239 0597 CE060000 		.4byte	.LASF111
+ 1240 059b 07       		.byte	0x7
+ 1241 059c 00       		.byte	0
+ 1242 059d 02       		.uleb128 0x2
+ 1243 059e 56050000 		.4byte	.LASF112
+ 1244 05a2 09       		.byte	0x9
+ 1245 05a3 90       		.byte	0x90
+ 1246 05a4 60050000 		.4byte	0x560
+ 1247 05a8 14       		.uleb128 0x14
+ 1248 05a9 0C       		.byte	0xc
+ 1249 05aa 0A       		.byte	0xa
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 32
+
+
+ 1250 05ab 3D       		.byte	0x3d
+ 1251 05ac 11060000 		.4byte	0x611
+ 1252 05b0 09       		.uleb128 0x9
+ 1253 05b1 61010000 		.4byte	.LASF113
+ 1254 05b5 0A       		.byte	0xa
+ 1255 05b6 40       		.byte	0x40
+ 1256 05b7 1D020000 		.4byte	0x21d
+ 1257 05bb 00       		.byte	0
+ 1258 05bc 09       		.uleb128 0x9
+ 1259 05bd 1C050000 		.4byte	.LASF114
+ 1260 05c1 0A       		.byte	0xa
+ 1261 05c2 42       		.byte	0x42
+ 1262 05c3 CA000000 		.4byte	0xca
+ 1263 05c7 04       		.byte	0x4
+ 1264 05c8 09       		.uleb128 0x9
+ 1265 05c9 08000000 		.4byte	.LASF115
+ 1266 05cd 0A       		.byte	0xa
+ 1267 05ce 44       		.byte	0x44
+ 1268 05cf CA000000 		.4byte	0xca
+ 1269 05d3 05       		.byte	0x5
+ 1270 05d4 09       		.uleb128 0x9
+ 1271 05d5 74030000 		.4byte	.LASF116
+ 1272 05d9 0A       		.byte	0xa
+ 1273 05da 46       		.byte	0x46
+ 1274 05db CA000000 		.4byte	0xca
+ 1275 05df 06       		.byte	0x6
+ 1276 05e0 09       		.uleb128 0x9
+ 1277 05e1 B80B0000 		.4byte	.LASF117
+ 1278 05e5 0A       		.byte	0xa
+ 1279 05e6 48       		.byte	0x48
+ 1280 05e7 CA000000 		.4byte	0xca
+ 1281 05eb 07       		.byte	0x7
+ 1282 05ec 09       		.uleb128 0x9
+ 1283 05ed 0C090000 		.4byte	.LASF118
+ 1284 05f1 0A       		.byte	0xa
+ 1285 05f2 4A       		.byte	0x4a
+ 1286 05f3 CA000000 		.4byte	0xca
+ 1287 05f7 08       		.byte	0x8
+ 1288 05f8 09       		.uleb128 0x9
+ 1289 05f9 19040000 		.4byte	.LASF119
+ 1290 05fd 0A       		.byte	0xa
+ 1291 05fe 4C       		.byte	0x4c
+ 1292 05ff CA000000 		.4byte	0xca
+ 1293 0603 09       		.byte	0x9
+ 1294 0604 09       		.uleb128 0x9
+ 1295 0605 DA040000 		.4byte	.LASF120
+ 1296 0609 0A       		.byte	0xa
+ 1297 060a 4F       		.byte	0x4f
+ 1298 060b 09010000 		.4byte	0x109
+ 1299 060f 0A       		.byte	0xa
+ 1300 0610 00       		.byte	0
+ 1301 0611 02       		.uleb128 0x2
+ 1302 0612 DF030000 		.4byte	.LASF121
+ 1303 0616 0A       		.byte	0xa
+ 1304 0617 50       		.byte	0x50
+ 1305 0618 A8050000 		.4byte	0x5a8
+ 1306 061c 02       		.uleb128 0x2
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 33
+
+
+ 1307 061d 3D010000 		.4byte	.LASF122
+ 1308 0621 0B       		.byte	0xb
+ 1309 0622 35       		.byte	0x35
+ 1310 0623 42000000 		.4byte	0x42
+ 1311 0627 13       		.uleb128 0x13
+ 1312 0628 01       		.byte	0x1
+ 1313 0629 42000000 		.4byte	0x42
+ 1314 062d 0B       		.byte	0xb
+ 1315 062e 39       		.byte	0x39
+ 1316 062f 58060000 		.4byte	0x658
+ 1317 0633 0D       		.uleb128 0xd
+ 1318 0634 59070000 		.4byte	.LASF123
+ 1319 0638 00       		.byte	0
+ 1320 0639 0D       		.uleb128 0xd
+ 1321 063a 10030000 		.4byte	.LASF124
+ 1322 063e 01       		.byte	0x1
+ 1323 063f 0D       		.uleb128 0xd
+ 1324 0640 30070000 		.4byte	.LASF125
+ 1325 0644 02       		.byte	0x2
+ 1326 0645 0D       		.uleb128 0xd
+ 1327 0646 BE0B0000 		.4byte	.LASF126
+ 1328 064a 03       		.byte	0x3
+ 1329 064b 0D       		.uleb128 0xd
+ 1330 064c 070C0000 		.4byte	.LASF127
+ 1331 0650 04       		.byte	0x4
+ 1332 0651 0D       		.uleb128 0xd
+ 1333 0652 48000000 		.4byte	.LASF128
+ 1334 0656 05       		.byte	0x5
+ 1335 0657 00       		.byte	0
+ 1336 0658 13       		.uleb128 0x13
+ 1337 0659 01       		.byte	0x1
+ 1338 065a 42000000 		.4byte	0x42
+ 1339 065e 0B       		.byte	0xb
+ 1340 065f 44       		.byte	0x44
+ 1341 0660 7D060000 		.4byte	0x67d
+ 1342 0664 0D       		.uleb128 0xd
+ 1343 0665 86040000 		.4byte	.LASF129
+ 1344 0669 00       		.byte	0
+ 1345 066a 0D       		.uleb128 0xd
+ 1346 066b 95040000 		.4byte	.LASF130
+ 1347 066f 01       		.byte	0x1
+ 1348 0670 0D       		.uleb128 0xd
+ 1349 0671 A4040000 		.4byte	.LASF131
+ 1350 0675 02       		.byte	0x2
+ 1351 0676 0D       		.uleb128 0xd
+ 1352 0677 B3040000 		.4byte	.LASF132
+ 1353 067b 03       		.byte	0x3
+ 1354 067c 00       		.byte	0
+ 1355 067d 02       		.uleb128 0x2
+ 1356 067e 76040000 		.4byte	.LASF133
+ 1357 0682 0C       		.byte	0xc
+ 1358 0683 6B       		.byte	0x6b
+ 1359 0684 1C060000 		.4byte	0x61c
+ 1360 0688 13       		.uleb128 0x13
+ 1361 0689 01       		.byte	0x1
+ 1362 068a 42000000 		.4byte	0x42
+ 1363 068e 0C       		.byte	0xc
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 34
+
+
+ 1364 068f 70       		.byte	0x70
+ 1365 0690 A7060000 		.4byte	0x6a7
+ 1366 0694 0D       		.uleb128 0xd
+ 1367 0695 4B030000 		.4byte	.LASF134
+ 1368 0699 00       		.byte	0
+ 1369 069a 0D       		.uleb128 0xd
+ 1370 069b 2E030000 		.4byte	.LASF135
+ 1371 069f 01       		.byte	0x1
+ 1372 06a0 0D       		.uleb128 0xd
+ 1373 06a1 62040000 		.4byte	.LASF136
+ 1374 06a5 02       		.byte	0x2
+ 1375 06a6 00       		.byte	0
+ 1376 06a7 02       		.uleb128 0x2
+ 1377 06a8 B7070000 		.4byte	.LASF137
+ 1378 06ac 0C       		.byte	0xc
+ 1379 06ad 74       		.byte	0x74
+ 1380 06ae 88060000 		.4byte	0x688
+ 1381 06b2 15       		.uleb128 0x15
+ 1382 06b3 1A000000 		.4byte	.LASF140
+ 1383 06b7 01       		.byte	0x1
+ 1384 06b8 51       		.byte	0x51
+ 1385 06b9 00000000 		.4byte	.LFB648
+ 1386 06bd 10000000 		.4byte	.LFE648-.LFB648
+ 1387 06c1 01       		.uleb128 0x1
+ 1388 06c2 9C       		.byte	0x9c
+ 1389 06c3 F0060000 		.4byte	0x6f0
+ 1390 06c7 16       		.uleb128 0x16
+ 1391 06c8 A2020000 		.4byte	.LASF138
+ 1392 06cc 01       		.byte	0x1
+ 1393 06cd 51       		.byte	0x51
+ 1394 06ce BF000000 		.4byte	0xbf
+ 1395 06d2 00000000 		.4byte	.LLST0
+ 1396 06d6 17       		.uleb128 0x17
+ 1397 06d7 08000000 		.4byte	.LVL1
+ 1398 06db B70A0000 		.4byte	0xab7
+ 1399 06df 18       		.uleb128 0x18
+ 1400 06e0 0E000000 		.4byte	.LVL2
+ 1401 06e4 C20A0000 		.4byte	0xac2
+ 1402 06e8 19       		.uleb128 0x19
+ 1403 06e9 01       		.uleb128 0x1
+ 1404 06ea 50       		.byte	0x50
+ 1405 06eb 02       		.uleb128 0x2
+ 1406 06ec 74       		.byte	0x74
+ 1407 06ed 00       		.sleb128 0
+ 1408 06ee 00       		.byte	0
+ 1409 06ef 00       		.byte	0
+ 1410 06f0 1A       		.uleb128 0x1a
+ 1411 06f1 6F0C0000 		.4byte	.LASF184
+ 1412 06f5 01       		.byte	0x1
+ 1413 06f6 6D       		.byte	0x6d
+ 1414 06f7 09010000 		.4byte	0x109
+ 1415 06fb 00000000 		.4byte	.LFB649
+ 1416 06ff 18000000 		.4byte	.LFE649-.LFB649
+ 1417 0703 01       		.uleb128 0x1
+ 1418 0704 9C       		.byte	0x9c
+ 1419 0705 3A070000 		.4byte	0x73a
+ 1420 0709 16       		.uleb128 0x16
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 35
+
+
+ 1421 070a 76010000 		.4byte	.LASF139
+ 1422 070e 01       		.byte	0x1
+ 1423 070f 6D       		.byte	0x6d
+ 1424 0710 09010000 		.4byte	0x109
+ 1425 0714 21000000 		.4byte	.LLST1
+ 1426 0718 1B       		.uleb128 0x1b
+ 1427 0719 86090000 		.4byte	.LASF152
+ 1428 071d 01       		.byte	0x1
+ 1429 071e 70       		.byte	0x70
+ 1430 071f CA000000 		.4byte	0xca
+ 1431 0723 5B000000 		.4byte	.LLST2
+ 1432 0727 17       		.uleb128 0x17
+ 1433 0728 08000000 		.4byte	.LVL5
+ 1434 072c CD0A0000 		.4byte	0xacd
+ 1435 0730 17       		.uleb128 0x17
+ 1436 0731 0E000000 		.4byte	.LVL7
+ 1437 0735 D80A0000 		.4byte	0xad8
+ 1438 0739 00       		.byte	0
+ 1439 073a 15       		.uleb128 0x15
+ 1440 073b 300C0000 		.4byte	.LASF141
+ 1441 073f 01       		.byte	0x1
+ 1442 0740 A5       		.byte	0xa5
+ 1443 0741 00000000 		.4byte	.LFB650
+ 1444 0745 44000000 		.4byte	.LFE650-.LFB650
+ 1445 0749 01       		.uleb128 0x1
+ 1446 074a 9C       		.byte	0x9c
+ 1447 074b F2070000 		.4byte	0x7f2
+ 1448 074f 16       		.uleb128 0x16
+ 1449 0750 61080000 		.4byte	.LASF142
+ 1450 0754 01       		.byte	0x1
+ 1451 0755 A5       		.byte	0xa5
+ 1452 0756 09010000 		.4byte	0x109
+ 1453 075a 9C000000 		.4byte	.LLST3
+ 1454 075e 16       		.uleb128 0x16
+ 1455 075f 9B0A0000 		.4byte	.LASF143
+ 1456 0763 01       		.byte	0x1
+ 1457 0764 A5       		.byte	0xa5
+ 1458 0765 09010000 		.4byte	0x109
+ 1459 0769 BD000000 		.4byte	.LLST4
+ 1460 076d 1C       		.uleb128 0x1c
+ 1461 076e 0E000000 		.4byte	.LVL13
+ 1462 0772 F0060000 		.4byte	0x6f0
+ 1463 0776 80070000 		.4byte	0x780
+ 1464 077a 19       		.uleb128 0x19
+ 1465 077b 01       		.uleb128 0x1
+ 1466 077c 50       		.byte	0x50
+ 1467 077d 01       		.uleb128 0x1
+ 1468 077e 31       		.byte	0x31
+ 1469 077f 00       		.byte	0
+ 1470 0780 1C       		.uleb128 0x1c
+ 1471 0781 18000000 		.4byte	.LVL14
+ 1472 0785 E30A0000 		.4byte	0xae3
+ 1473 0789 98070000 		.4byte	0x798
+ 1474 078d 19       		.uleb128 0x19
+ 1475 078e 01       		.uleb128 0x1
+ 1476 078f 50       		.byte	0x50
+ 1477 0790 01       		.uleb128 0x1
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 36
+
+
+ 1478 0791 30       		.byte	0x30
+ 1479 0792 19       		.uleb128 0x19
+ 1480 0793 01       		.uleb128 0x1
+ 1481 0794 51       		.byte	0x51
+ 1482 0795 01       		.uleb128 0x1
+ 1483 0796 33       		.byte	0x33
+ 1484 0797 00       		.byte	0
+ 1485 0798 1C       		.uleb128 0x1c
+ 1486 0799 20000000 		.4byte	.LVL15
+ 1487 079d E30A0000 		.4byte	0xae3
+ 1488 07a1 B0070000 		.4byte	0x7b0
+ 1489 07a5 19       		.uleb128 0x19
+ 1490 07a6 01       		.uleb128 0x1
+ 1491 07a7 50       		.byte	0x50
+ 1492 07a8 01       		.uleb128 0x1
+ 1493 07a9 30       		.byte	0x30
+ 1494 07aa 19       		.uleb128 0x19
+ 1495 07ab 01       		.uleb128 0x1
+ 1496 07ac 51       		.byte	0x51
+ 1497 07ad 01       		.uleb128 0x1
+ 1498 07ae 33       		.byte	0x33
+ 1499 07af 00       		.byte	0
+ 1500 07b0 1C       		.uleb128 0x1c
+ 1501 07b1 2E000000 		.4byte	.LVL16
+ 1502 07b5 E30A0000 		.4byte	0xae3
+ 1503 07b9 C9070000 		.4byte	0x7c9
+ 1504 07bd 19       		.uleb128 0x19
+ 1505 07be 01       		.uleb128 0x1
+ 1506 07bf 50       		.byte	0x50
+ 1507 07c0 02       		.uleb128 0x2
+ 1508 07c1 74       		.byte	0x74
+ 1509 07c2 00       		.sleb128 0
+ 1510 07c3 19       		.uleb128 0x19
+ 1511 07c4 01       		.uleb128 0x1
+ 1512 07c5 51       		.byte	0x51
+ 1513 07c6 01       		.uleb128 0x1
+ 1514 07c7 33       		.byte	0x33
+ 1515 07c8 00       		.byte	0
+ 1516 07c9 1C       		.uleb128 0x1c
+ 1517 07ca 36000000 		.4byte	.LVL17
+ 1518 07ce E30A0000 		.4byte	0xae3
+ 1519 07d2 E2070000 		.4byte	0x7e2
+ 1520 07d6 19       		.uleb128 0x19
+ 1521 07d7 01       		.uleb128 0x1
+ 1522 07d8 50       		.byte	0x50
+ 1523 07d9 02       		.uleb128 0x2
+ 1524 07da 74       		.byte	0x74
+ 1525 07db 00       		.sleb128 0
+ 1526 07dc 19       		.uleb128 0x19
+ 1527 07dd 01       		.uleb128 0x1
+ 1528 07de 51       		.byte	0x51
+ 1529 07df 01       		.uleb128 0x1
+ 1530 07e0 33       		.byte	0x33
+ 1531 07e1 00       		.byte	0
+ 1532 07e2 18       		.uleb128 0x18
+ 1533 07e3 3E000000 		.4byte	.LVL18
+ 1534 07e7 F0060000 		.4byte	0x6f0
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 37
+
+
+ 1535 07eb 19       		.uleb128 0x19
+ 1536 07ec 01       		.uleb128 0x1
+ 1537 07ed 50       		.byte	0x50
+ 1538 07ee 01       		.uleb128 0x1
+ 1539 07ef 30       		.byte	0x30
+ 1540 07f0 00       		.byte	0
+ 1541 07f1 00       		.byte	0
+ 1542 07f2 15       		.uleb128 0x15
+ 1543 07f3 64090000 		.4byte	.LASF144
+ 1544 07f7 01       		.byte	0x1
+ 1545 07f8 E1       		.byte	0xe1
+ 1546 07f9 00000000 		.4byte	.LFB651
+ 1547 07fd 54000000 		.4byte	.LFE651-.LFB651
+ 1548 0801 01       		.uleb128 0x1
+ 1549 0802 9C       		.byte	0x9c
+ 1550 0803 E4080000 		.4byte	0x8e4
+ 1551 0807 16       		.uleb128 0x16
+ 1552 0808 3F020000 		.4byte	.LASF145
+ 1553 080c 01       		.byte	0x1
+ 1554 080d E1       		.byte	0xe1
+ 1555 080e E4080000 		.4byte	0x8e4
+ 1556 0812 DE000000 		.4byte	.LLST5
+ 1557 0816 16       		.uleb128 0x16
+ 1558 0817 D5070000 		.4byte	.LASF146
+ 1559 081b 01       		.byte	0x1
+ 1560 081c E1       		.byte	0xe1
+ 1561 081d E4080000 		.4byte	0x8e4
+ 1562 0821 FC000000 		.4byte	.LLST6
+ 1563 0825 16       		.uleb128 0x16
+ 1564 0826 D4030000 		.4byte	.LASF147
+ 1565 082a 01       		.byte	0x1
+ 1566 082b E2       		.byte	0xe2
+ 1567 082c A7060000 		.4byte	0x6a7
+ 1568 0830 1A010000 		.4byte	.LLST7
+ 1569 0834 16       		.uleb128 0x16
+ 1570 0835 9B0A0000 		.4byte	.LASF143
+ 1571 0839 01       		.byte	0x1
+ 1572 083a E2       		.byte	0xe2
+ 1573 083b 09010000 		.4byte	0x109
+ 1574 083f 3B010000 		.4byte	.LLST8
+ 1575 0843 1C       		.uleb128 0x1c
+ 1576 0844 12000000 		.4byte	.LVL21
+ 1577 0848 F0060000 		.4byte	0x6f0
+ 1578 084c 56080000 		.4byte	0x856
+ 1579 0850 19       		.uleb128 0x19
+ 1580 0851 01       		.uleb128 0x1
+ 1581 0852 50       		.byte	0x50
+ 1582 0853 01       		.uleb128 0x1
+ 1583 0854 31       		.byte	0x31
+ 1584 0855 00       		.byte	0
+ 1585 0856 1C       		.uleb128 0x1c
+ 1586 0857 1C000000 		.4byte	.LVL22
+ 1587 085b EE0A0000 		.4byte	0xaee
+ 1588 085f 70080000 		.4byte	0x870
+ 1589 0863 19       		.uleb128 0x19
+ 1590 0864 01       		.uleb128 0x1
+ 1591 0865 50       		.byte	0x50
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 38
+
+
+ 1592 0866 02       		.uleb128 0x2
+ 1593 0867 77       		.byte	0x77
+ 1594 0868 00       		.sleb128 0
+ 1595 0869 19       		.uleb128 0x19
+ 1596 086a 01       		.uleb128 0x1
+ 1597 086b 51       		.byte	0x51
+ 1598 086c 02       		.uleb128 0x2
+ 1599 086d 76       		.byte	0x76
+ 1600 086e 00       		.sleb128 0
+ 1601 086f 00       		.byte	0
+ 1602 0870 1C       		.uleb128 0x1c
+ 1603 0871 2E000000 		.4byte	.LVL23
+ 1604 0875 E30A0000 		.4byte	0xae3
+ 1605 0879 89080000 		.4byte	0x889
+ 1606 087d 19       		.uleb128 0x19
+ 1607 087e 01       		.uleb128 0x1
+ 1608 087f 50       		.byte	0x50
+ 1609 0880 02       		.uleb128 0x2
+ 1610 0881 77       		.byte	0x77
+ 1611 0882 00       		.sleb128 0
+ 1612 0883 19       		.uleb128 0x19
+ 1613 0884 01       		.uleb128 0x1
+ 1614 0885 51       		.byte	0x51
+ 1615 0886 01       		.uleb128 0x1
+ 1616 0887 30       		.byte	0x30
+ 1617 0888 00       		.byte	0
+ 1618 0889 1C       		.uleb128 0x1c
+ 1619 088a 3A000000 		.4byte	.LVL24
+ 1620 088e E30A0000 		.4byte	0xae3
+ 1621 0892 A2080000 		.4byte	0x8a2
+ 1622 0896 19       		.uleb128 0x19
+ 1623 0897 01       		.uleb128 0x1
+ 1624 0898 50       		.byte	0x50
+ 1625 0899 02       		.uleb128 0x2
+ 1626 089a 77       		.byte	0x77
+ 1627 089b 00       		.sleb128 0
+ 1628 089c 19       		.uleb128 0x19
+ 1629 089d 01       		.uleb128 0x1
+ 1630 089e 51       		.byte	0x51
+ 1631 089f 01       		.uleb128 0x1
+ 1632 08a0 31       		.byte	0x31
+ 1633 08a1 00       		.byte	0
+ 1634 08a2 1C       		.uleb128 0x1c
+ 1635 08a3 42000000 		.4byte	.LVL25
+ 1636 08a7 E30A0000 		.4byte	0xae3
+ 1637 08ab BB080000 		.4byte	0x8bb
+ 1638 08af 19       		.uleb128 0x19
+ 1639 08b0 01       		.uleb128 0x1
+ 1640 08b1 50       		.byte	0x50
+ 1641 08b2 02       		.uleb128 0x2
+ 1642 08b3 76       		.byte	0x76
+ 1643 08b4 00       		.sleb128 0
+ 1644 08b5 19       		.uleb128 0x19
+ 1645 08b6 01       		.uleb128 0x1
+ 1646 08b7 51       		.byte	0x51
+ 1647 08b8 01       		.uleb128 0x1
+ 1648 08b9 32       		.byte	0x32
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 39
+
+
+ 1649 08ba 00       		.byte	0
+ 1650 08bb 1C       		.uleb128 0x1c
+ 1651 08bc 4A000000 		.4byte	.LVL26
+ 1652 08c0 E30A0000 		.4byte	0xae3
+ 1653 08c4 D4080000 		.4byte	0x8d4
+ 1654 08c8 19       		.uleb128 0x19
+ 1655 08c9 01       		.uleb128 0x1
+ 1656 08ca 50       		.byte	0x50
+ 1657 08cb 02       		.uleb128 0x2
+ 1658 08cc 76       		.byte	0x76
+ 1659 08cd 00       		.sleb128 0
+ 1660 08ce 19       		.uleb128 0x19
+ 1661 08cf 01       		.uleb128 0x1
+ 1662 08d0 51       		.byte	0x51
+ 1663 08d1 01       		.uleb128 0x1
+ 1664 08d2 33       		.byte	0x33
+ 1665 08d3 00       		.byte	0
+ 1666 08d4 18       		.uleb128 0x18
+ 1667 08d5 52000000 		.4byte	.LVL27
+ 1668 08d9 F0060000 		.4byte	0x6f0
+ 1669 08dd 19       		.uleb128 0x19
+ 1670 08de 01       		.uleb128 0x1
+ 1671 08df 50       		.byte	0x50
+ 1672 08e0 01       		.uleb128 0x1
+ 1673 08e1 30       		.byte	0x30
+ 1674 08e2 00       		.byte	0
+ 1675 08e3 00       		.byte	0
+ 1676 08e4 06       		.uleb128 0x6
+ 1677 08e5 04       		.byte	0x4
+ 1678 08e6 7D060000 		.4byte	0x67d
+ 1679 08ea 1D       		.uleb128 0x1d
+ 1680 08eb B1050000 		.4byte	.LASF148
+ 1681 08ef 01       		.byte	0x1
+ 1682 08f0 2E01     		.2byte	0x12e
+ 1683 08f2 00000000 		.4byte	.LFB652
+ 1684 08f6 30000000 		.4byte	.LFE652-.LFB652
+ 1685 08fa 01       		.uleb128 0x1
+ 1686 08fb 9C       		.byte	0x9c
+ 1687 08fc 6A090000 		.4byte	0x96a
+ 1688 0900 1E       		.uleb128 0x1e
+ 1689 0901 DB000000 		.4byte	.LASF149
+ 1690 0905 01       		.byte	0x1
+ 1691 0906 2E01     		.2byte	0x12e
+ 1692 0908 E4080000 		.4byte	0x8e4
+ 1693 090c 5C010000 		.4byte	.LLST9
+ 1694 0910 1E       		.uleb128 0x1e
+ 1695 0911 AE020000 		.4byte	.LASF150
+ 1696 0915 01       		.byte	0x1
+ 1697 0916 2E01     		.2byte	0x12e
+ 1698 0918 E4080000 		.4byte	0x8e4
+ 1699 091c 7A010000 		.4byte	.LLST10
+ 1700 0920 1E       		.uleb128 0x1e
+ 1701 0921 F8060000 		.4byte	.LASF151
+ 1702 0925 01       		.byte	0x1
+ 1703 0926 2F01     		.2byte	0x12f
+ 1704 0928 1D020000 		.4byte	0x21d
+ 1705 092c 98010000 		.4byte	.LLST11
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 40
+
+
+ 1706 0930 1F       		.uleb128 0x1f
+ 1707 0931 24050000 		.4byte	.LASF153
+ 1708 0935 01       		.byte	0x1
+ 1709 0936 3201     		.2byte	0x132
+ 1710 0938 D5000000 		.4byte	0xd5
+ 1711 093c B6010000 		.4byte	.LLST12
+ 1712 0940 1F       		.uleb128 0x1f
+ 1713 0941 C00A0000 		.4byte	.LASF154
+ 1714 0945 01       		.byte	0x1
+ 1715 0946 3501     		.2byte	0x135
+ 1716 0948 D5000000 		.4byte	0xd5
+ 1717 094c D4010000 		.4byte	.LLST13
+ 1718 0950 1F       		.uleb128 0x1f
+ 1719 0951 7B000000 		.4byte	.LASF155
+ 1720 0955 01       		.byte	0x1
+ 1721 0956 3801     		.2byte	0x138
+ 1722 0958 D5000000 		.4byte	0xd5
+ 1723 095c 01020000 		.4byte	.LLST14
+ 1724 0960 17       		.uleb128 0x17
+ 1725 0961 24000000 		.4byte	.LVL34
+ 1726 0965 F90A0000 		.4byte	0xaf9
+ 1727 0969 00       		.byte	0
+ 1728 096a 1D       		.uleb128 0x1d
+ 1729 096b 61000000 		.4byte	.LASF156
+ 1730 096f 01       		.byte	0x1
+ 1731 0970 6E01     		.2byte	0x16e
+ 1732 0972 00000000 		.4byte	.LFB653
+ 1733 0976 18010000 		.4byte	.LFE653-.LFB653
+ 1734 097a 01       		.uleb128 0x1
+ 1735 097b 9C       		.byte	0x9c
+ 1736 097c 2B0A0000 		.4byte	0xa2b
+ 1737 0980 20       		.uleb128 0x20
+ 1738 0981 DB000000 		.4byte	.LASF149
+ 1739 0985 01       		.byte	0x1
+ 1740 0986 6E01     		.2byte	0x16e
+ 1741 0988 E4080000 		.4byte	0x8e4
+ 1742 098c 01       		.uleb128 0x1
+ 1743 098d 50       		.byte	0x50
+ 1744 098e 1E       		.uleb128 0x1e
+ 1745 098f 6C080000 		.4byte	.LASF157
+ 1746 0993 01       		.byte	0x1
+ 1747 0994 6E01     		.2byte	0x16e
+ 1748 0996 B2000000 		.4byte	0xb2
+ 1749 099a 14020000 		.4byte	.LLST15
+ 1750 099e 20       		.uleb128 0x20
+ 1751 099f 2B040000 		.4byte	.LASF158
+ 1752 09a3 01       		.byte	0x1
+ 1753 09a4 6F01     		.2byte	0x16f
+ 1754 09a6 2B0A0000 		.4byte	0xa2b
+ 1755 09aa 01       		.uleb128 0x1
+ 1756 09ab 52       		.byte	0x52
+ 1757 09ac 20       		.uleb128 0x20
+ 1758 09ad 2B0A0000 		.4byte	.LASF159
+ 1759 09b1 01       		.byte	0x1
+ 1760 09b2 6F01     		.2byte	0x16f
+ 1761 09b4 1D020000 		.4byte	0x21d
+ 1762 09b8 01       		.uleb128 0x1
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 41
+
+
+ 1763 09b9 53       		.byte	0x53
+ 1764 09ba 1F       		.uleb128 0x1f
+ 1765 09bb 1F040000 		.4byte	.LASF160
+ 1766 09bf 01       		.byte	0x1
+ 1767 09c0 7201     		.2byte	0x172
+ 1768 09c2 B2000000 		.4byte	0xb2
+ 1769 09c6 35020000 		.4byte	.LLST16
+ 1770 09ca 1F       		.uleb128 0x1f
+ 1771 09cb C0060000 		.4byte	.LASF161
+ 1772 09cf 01       		.byte	0x1
+ 1773 09d0 7601     		.2byte	0x176
+ 1774 09d2 D5000000 		.4byte	0xd5
+ 1775 09d6 53020000 		.4byte	.LLST17
+ 1776 09da 1F       		.uleb128 0x1f
+ 1777 09db E4080000 		.4byte	.LASF162
+ 1778 09df 01       		.byte	0x1
+ 1779 09e0 7801     		.2byte	0x178
+ 1780 09e2 D5000000 		.4byte	0xd5
+ 1781 09e6 66020000 		.4byte	.LLST18
+ 1782 09ea 1F       		.uleb128 0x1f
+ 1783 09eb 98020000 		.4byte	.LASF163
+ 1784 09ef 01       		.byte	0x1
+ 1785 09f0 7C01     		.2byte	0x17c
+ 1786 09f2 D5000000 		.4byte	0xd5
+ 1787 09f6 79020000 		.4byte	.LLST19
+ 1788 09fa 1F       		.uleb128 0x1f
+ 1789 09fb 1D090000 		.4byte	.LASF164
+ 1790 09ff 01       		.byte	0x1
+ 1791 0a00 7E01     		.2byte	0x17e
+ 1792 0a02 D5000000 		.4byte	0xd5
+ 1793 0a06 97020000 		.4byte	.LLST20
+ 1794 0a0a 1F       		.uleb128 0x1f
+ 1795 0a0b C4030000 		.4byte	.LASF165
+ 1796 0a0f 01       		.byte	0x1
+ 1797 0a10 8101     		.2byte	0x181
+ 1798 0a12 CA000000 		.4byte	0xca
+ 1799 0a16 E9020000 		.4byte	.LLST21
+ 1800 0a1a 1F       		.uleb128 0x1f
+ 1801 0a1b 9A080000 		.4byte	.LASF166
+ 1802 0a1f 01       		.byte	0x1
+ 1803 0a20 8301     		.2byte	0x183
+ 1804 0a22 CA000000 		.4byte	0xca
+ 1805 0a26 34030000 		.4byte	.LLST22
+ 1806 0a2a 00       		.byte	0
+ 1807 0a2b 06       		.uleb128 0x6
+ 1808 0a2c 04       		.byte	0x4
+ 1809 0a2d 11060000 		.4byte	0x611
+ 1810 0a31 21       		.uleb128 0x21
+ 1811 0a32 C8070000 		.4byte	.LASF167
+ 1812 0a36 0D       		.byte	0xd
+ 1813 0a37 EA07     		.2byte	0x7ea
+ 1814 0a39 3D0A0000 		.4byte	0xa3d
+ 1815 0a3d 07       		.uleb128 0x7
+ 1816 0a3e E0000000 		.4byte	0xe0
+ 1817 0a42 21       		.uleb128 0x21
+ 1818 0a43 76090000 		.4byte	.LASF168
+ 1819 0a47 09       		.byte	0x9
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 42
+
+
+ 1820 0a48 2202     		.2byte	0x222
+ 1821 0a4a 55050000 		.4byte	0x555
+ 1822 0a4e 22       		.uleb128 0x22
+ 1823 0a4f 24050000 		.4byte	0x524
+ 1824 0a53 5E0A0000 		.4byte	0xa5e
+ 1825 0a57 23       		.uleb128 0x23
+ 1826 0a58 AB000000 		.4byte	0xab
+ 1827 0a5c 00       		.byte	0
+ 1828 0a5d 00       		.byte	0
+ 1829 0a5e 21       		.uleb128 0x21
+ 1830 0a5f 890A0000 		.4byte	.LASF169
+ 1831 0a63 09       		.byte	0x9
+ 1832 0a64 2C02     		.2byte	0x22c
+ 1833 0a66 4E0A0000 		.4byte	0xa4e
+ 1834 0a6a 22       		.uleb128 0x22
+ 1835 0a6b 9D050000 		.4byte	0x59d
+ 1836 0a6f 7A0A0000 		.4byte	0xa7a
+ 1837 0a73 23       		.uleb128 0x23
+ 1838 0a74 AB000000 		.4byte	0xab
+ 1839 0a78 00       		.byte	0
+ 1840 0a79 00       		.byte	0
+ 1841 0a7a 21       		.uleb128 0x21
+ 1842 0a7b 34040000 		.4byte	.LASF170
+ 1843 0a7f 09       		.byte	0x9
+ 1844 0a80 2D02     		.2byte	0x22d
+ 1845 0a82 6A0A0000 		.4byte	0xa6a
+ 1846 0a86 24       		.uleb128 0x24
+ 1847 0a87 A60A0000 		.4byte	.LASF171
+ 1848 0a8b 0E       		.byte	0xe
+ 1849 0a8c 5E       		.byte	0x5e
+ 1850 0a8d 18040000 		.4byte	0x418
+ 1851 0a91 24       		.uleb128 0x24
+ 1852 0a92 430B0000 		.4byte	.LASF172
+ 1853 0a96 0F       		.byte	0xf
+ 1854 0a97 1F       		.byte	0x1f
+ 1855 0a98 9C0A0000 		.4byte	0xa9c
+ 1856 0a9c 25       		.uleb128 0x25
+ 1857 0a9d 01020000 		.4byte	0x201
+ 1858 0aa1 24       		.uleb128 0x24
+ 1859 0aa2 45040000 		.4byte	.LASF173
+ 1860 0aa6 10       		.byte	0x10
+ 1861 0aa7 87       		.byte	0x87
+ 1862 0aa8 F4040000 		.4byte	0x4f4
+ 1863 0aac 24       		.uleb128 0x24
+ 1864 0aad 4A050000 		.4byte	.LASF174
+ 1865 0ab1 11       		.byte	0x11
+ 1866 0ab2 4B       		.byte	0x4b
+ 1867 0ab3 7D030000 		.4byte	0x37d
+ 1868 0ab7 26       		.uleb128 0x26
+ 1869 0ab8 A4050000 		.4byte	.LASF175
+ 1870 0abc A4050000 		.4byte	.LASF175
+ 1871 0ac0 0B       		.byte	0xb
+ 1872 0ac1 4D       		.byte	0x4d
+ 1873 0ac2 26       		.uleb128 0x26
+ 1874 0ac3 CE0A0000 		.4byte	.LASF176
+ 1875 0ac7 CE0A0000 		.4byte	.LASF176
+ 1876 0acb 0B       		.byte	0xb
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 43
+
+
+ 1877 0acc 52       		.byte	0x52
+ 1878 0acd 26       		.uleb128 0x26
+ 1879 0ace 41070000 		.4byte	.LASF177
+ 1880 0ad2 41070000 		.4byte	.LASF177
+ 1881 0ad6 0B       		.byte	0xb
+ 1882 0ad7 4E       		.byte	0x4e
+ 1883 0ad8 26       		.uleb128 0x26
+ 1884 0ad9 830B0000 		.4byte	.LASF178
+ 1885 0add 830B0000 		.4byte	.LASF178
+ 1886 0ae1 0B       		.byte	0xb
+ 1887 0ae2 4F       		.byte	0x4f
+ 1888 0ae3 26       		.uleb128 0x26
+ 1889 0ae4 0B010000 		.4byte	.LASF179
+ 1890 0ae8 0B010000 		.4byte	.LASF179
+ 1891 0aec 0B       		.byte	0xb
+ 1892 0aed 55       		.byte	0x55
+ 1893 0aee 26       		.uleb128 0x26
+ 1894 0aef F9070000 		.4byte	.LASF180
+ 1895 0af3 F9070000 		.4byte	.LASF180
+ 1896 0af7 0B       		.byte	0xb
+ 1897 0af8 56       		.byte	0x56
+ 1898 0af9 27       		.uleb128 0x27
+ 1899 0afa 77020000 		.4byte	.LASF185
+ 1900 0afe 77020000 		.4byte	.LASF185
+ 1901 0b02 00       		.byte	0
+ 1902              		.section	.debug_abbrev,"",%progbits
+ 1903              	.Ldebug_abbrev0:
+ 1904 0000 01       		.uleb128 0x1
+ 1905 0001 11       		.uleb128 0x11
+ 1906 0002 01       		.byte	0x1
+ 1907 0003 25       		.uleb128 0x25
+ 1908 0004 0E       		.uleb128 0xe
+ 1909 0005 13       		.uleb128 0x13
+ 1910 0006 0B       		.uleb128 0xb
+ 1911 0007 03       		.uleb128 0x3
+ 1912 0008 0E       		.uleb128 0xe
+ 1913 0009 1B       		.uleb128 0x1b
+ 1914 000a 0E       		.uleb128 0xe
+ 1915 000b 55       		.uleb128 0x55
+ 1916 000c 17       		.uleb128 0x17
+ 1917 000d 11       		.uleb128 0x11
+ 1918 000e 01       		.uleb128 0x1
+ 1919 000f 10       		.uleb128 0x10
+ 1920 0010 17       		.uleb128 0x17
+ 1921 0011 00       		.byte	0
+ 1922 0012 00       		.byte	0
+ 1923 0013 02       		.uleb128 0x2
+ 1924 0014 16       		.uleb128 0x16
+ 1925 0015 00       		.byte	0
+ 1926 0016 03       		.uleb128 0x3
+ 1927 0017 0E       		.uleb128 0xe
+ 1928 0018 3A       		.uleb128 0x3a
+ 1929 0019 0B       		.uleb128 0xb
+ 1930 001a 3B       		.uleb128 0x3b
+ 1931 001b 0B       		.uleb128 0xb
+ 1932 001c 49       		.uleb128 0x49
+ 1933 001d 13       		.uleb128 0x13
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 44
+
+
+ 1934 001e 00       		.byte	0
+ 1935 001f 00       		.byte	0
+ 1936 0020 03       		.uleb128 0x3
+ 1937 0021 24       		.uleb128 0x24
+ 1938 0022 00       		.byte	0
+ 1939 0023 0B       		.uleb128 0xb
+ 1940 0024 0B       		.uleb128 0xb
+ 1941 0025 3E       		.uleb128 0x3e
+ 1942 0026 0B       		.uleb128 0xb
+ 1943 0027 03       		.uleb128 0x3
+ 1944 0028 0E       		.uleb128 0xe
+ 1945 0029 00       		.byte	0
+ 1946 002a 00       		.byte	0
+ 1947 002b 04       		.uleb128 0x4
+ 1948 002c 24       		.uleb128 0x24
+ 1949 002d 00       		.byte	0
+ 1950 002e 0B       		.uleb128 0xb
+ 1951 002f 0B       		.uleb128 0xb
+ 1952 0030 3E       		.uleb128 0x3e
+ 1953 0031 0B       		.uleb128 0xb
+ 1954 0032 03       		.uleb128 0x3
+ 1955 0033 08       		.uleb128 0x8
+ 1956 0034 00       		.byte	0
+ 1957 0035 00       		.byte	0
+ 1958 0036 05       		.uleb128 0x5
+ 1959 0037 0F       		.uleb128 0xf
+ 1960 0038 00       		.byte	0
+ 1961 0039 0B       		.uleb128 0xb
+ 1962 003a 0B       		.uleb128 0xb
+ 1963 003b 00       		.byte	0
+ 1964 003c 00       		.byte	0
+ 1965 003d 06       		.uleb128 0x6
+ 1966 003e 0F       		.uleb128 0xf
+ 1967 003f 00       		.byte	0
+ 1968 0040 0B       		.uleb128 0xb
+ 1969 0041 0B       		.uleb128 0xb
+ 1970 0042 49       		.uleb128 0x49
+ 1971 0043 13       		.uleb128 0x13
+ 1972 0044 00       		.byte	0
+ 1973 0045 00       		.byte	0
+ 1974 0046 07       		.uleb128 0x7
+ 1975 0047 35       		.uleb128 0x35
+ 1976 0048 00       		.byte	0
+ 1977 0049 49       		.uleb128 0x49
+ 1978 004a 13       		.uleb128 0x13
+ 1979 004b 00       		.byte	0
+ 1980 004c 00       		.byte	0
+ 1981 004d 08       		.uleb128 0x8
+ 1982 004e 13       		.uleb128 0x13
+ 1983 004f 01       		.byte	0x1
+ 1984 0050 03       		.uleb128 0x3
+ 1985 0051 0E       		.uleb128 0xe
+ 1986 0052 0B       		.uleb128 0xb
+ 1987 0053 0B       		.uleb128 0xb
+ 1988 0054 3A       		.uleb128 0x3a
+ 1989 0055 0B       		.uleb128 0xb
+ 1990 0056 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 45
+
+
+ 1991 0057 0B       		.uleb128 0xb
+ 1992 0058 01       		.uleb128 0x1
+ 1993 0059 13       		.uleb128 0x13
+ 1994 005a 00       		.byte	0
+ 1995 005b 00       		.byte	0
+ 1996 005c 09       		.uleb128 0x9
+ 1997 005d 0D       		.uleb128 0xd
+ 1998 005e 00       		.byte	0
+ 1999 005f 03       		.uleb128 0x3
+ 2000 0060 0E       		.uleb128 0xe
+ 2001 0061 3A       		.uleb128 0x3a
+ 2002 0062 0B       		.uleb128 0xb
+ 2003 0063 3B       		.uleb128 0x3b
+ 2004 0064 0B       		.uleb128 0xb
+ 2005 0065 49       		.uleb128 0x49
+ 2006 0066 13       		.uleb128 0x13
+ 2007 0067 38       		.uleb128 0x38
+ 2008 0068 0B       		.uleb128 0xb
+ 2009 0069 00       		.byte	0
+ 2010 006a 00       		.byte	0
+ 2011 006b 0A       		.uleb128 0xa
+ 2012 006c 15       		.uleb128 0x15
+ 2013 006d 01       		.byte	0x1
+ 2014 006e 27       		.uleb128 0x27
+ 2015 006f 19       		.uleb128 0x19
+ 2016 0070 01       		.uleb128 0x1
+ 2017 0071 13       		.uleb128 0x13
+ 2018 0072 00       		.byte	0
+ 2019 0073 00       		.byte	0
+ 2020 0074 0B       		.uleb128 0xb
+ 2021 0075 05       		.uleb128 0x5
+ 2022 0076 00       		.byte	0
+ 2023 0077 49       		.uleb128 0x49
+ 2024 0078 13       		.uleb128 0x13
+ 2025 0079 00       		.byte	0
+ 2026 007a 00       		.byte	0
+ 2027 007b 0C       		.uleb128 0xc
+ 2028 007c 04       		.uleb128 0x4
+ 2029 007d 01       		.byte	0x1
+ 2030 007e 0B       		.uleb128 0xb
+ 2031 007f 0B       		.uleb128 0xb
+ 2032 0080 49       		.uleb128 0x49
+ 2033 0081 13       		.uleb128 0x13
+ 2034 0082 3A       		.uleb128 0x3a
+ 2035 0083 0B       		.uleb128 0xb
+ 2036 0084 3B       		.uleb128 0x3b
+ 2037 0085 05       		.uleb128 0x5
+ 2038 0086 01       		.uleb128 0x1
+ 2039 0087 13       		.uleb128 0x13
+ 2040 0088 00       		.byte	0
+ 2041 0089 00       		.byte	0
+ 2042 008a 0D       		.uleb128 0xd
+ 2043 008b 28       		.uleb128 0x28
+ 2044 008c 00       		.byte	0
+ 2045 008d 03       		.uleb128 0x3
+ 2046 008e 0E       		.uleb128 0xe
+ 2047 008f 1C       		.uleb128 0x1c
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 46
+
+
+ 2048 0090 0B       		.uleb128 0xb
+ 2049 0091 00       		.byte	0
+ 2050 0092 00       		.byte	0
+ 2051 0093 0E       		.uleb128 0xe
+ 2052 0094 16       		.uleb128 0x16
+ 2053 0095 00       		.byte	0
+ 2054 0096 03       		.uleb128 0x3
+ 2055 0097 0E       		.uleb128 0xe
+ 2056 0098 3A       		.uleb128 0x3a
+ 2057 0099 0B       		.uleb128 0xb
+ 2058 009a 3B       		.uleb128 0x3b
+ 2059 009b 05       		.uleb128 0x5
+ 2060 009c 49       		.uleb128 0x49
+ 2061 009d 13       		.uleb128 0x13
+ 2062 009e 00       		.byte	0
+ 2063 009f 00       		.byte	0
+ 2064 00a0 0F       		.uleb128 0xf
+ 2065 00a1 13       		.uleb128 0x13
+ 2066 00a2 01       		.byte	0x1
+ 2067 00a3 03       		.uleb128 0x3
+ 2068 00a4 0E       		.uleb128 0xe
+ 2069 00a5 0B       		.uleb128 0xb
+ 2070 00a6 0B       		.uleb128 0xb
+ 2071 00a7 3A       		.uleb128 0x3a
+ 2072 00a8 0B       		.uleb128 0xb
+ 2073 00a9 3B       		.uleb128 0x3b
+ 2074 00aa 05       		.uleb128 0x5
+ 2075 00ab 01       		.uleb128 0x1
+ 2076 00ac 13       		.uleb128 0x13
+ 2077 00ad 00       		.byte	0
+ 2078 00ae 00       		.byte	0
+ 2079 00af 10       		.uleb128 0x10
+ 2080 00b0 0D       		.uleb128 0xd
+ 2081 00b1 00       		.byte	0
+ 2082 00b2 03       		.uleb128 0x3
+ 2083 00b3 0E       		.uleb128 0xe
+ 2084 00b4 3A       		.uleb128 0x3a
+ 2085 00b5 0B       		.uleb128 0xb
+ 2086 00b6 3B       		.uleb128 0x3b
+ 2087 00b7 05       		.uleb128 0x5
+ 2088 00b8 49       		.uleb128 0x49
+ 2089 00b9 13       		.uleb128 0x13
+ 2090 00ba 38       		.uleb128 0x38
+ 2091 00bb 0B       		.uleb128 0xb
+ 2092 00bc 00       		.byte	0
+ 2093 00bd 00       		.byte	0
+ 2094 00be 11       		.uleb128 0x11
+ 2095 00bf 0D       		.uleb128 0xd
+ 2096 00c0 00       		.byte	0
+ 2097 00c1 03       		.uleb128 0x3
+ 2098 00c2 08       		.uleb128 0x8
+ 2099 00c3 3A       		.uleb128 0x3a
+ 2100 00c4 0B       		.uleb128 0xb
+ 2101 00c5 3B       		.uleb128 0x3b
+ 2102 00c6 05       		.uleb128 0x5
+ 2103 00c7 49       		.uleb128 0x49
+ 2104 00c8 13       		.uleb128 0x13
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 47
+
+
+ 2105 00c9 38       		.uleb128 0x38
+ 2106 00ca 0B       		.uleb128 0xb
+ 2107 00cb 00       		.byte	0
+ 2108 00cc 00       		.byte	0
+ 2109 00cd 12       		.uleb128 0x12
+ 2110 00ce 13       		.uleb128 0x13
+ 2111 00cf 01       		.byte	0x1
+ 2112 00d0 0B       		.uleb128 0xb
+ 2113 00d1 0B       		.uleb128 0xb
+ 2114 00d2 3A       		.uleb128 0x3a
+ 2115 00d3 0B       		.uleb128 0xb
+ 2116 00d4 3B       		.uleb128 0x3b
+ 2117 00d5 05       		.uleb128 0x5
+ 2118 00d6 01       		.uleb128 0x1
+ 2119 00d7 13       		.uleb128 0x13
+ 2120 00d8 00       		.byte	0
+ 2121 00d9 00       		.byte	0
+ 2122 00da 13       		.uleb128 0x13
+ 2123 00db 04       		.uleb128 0x4
+ 2124 00dc 01       		.byte	0x1
+ 2125 00dd 0B       		.uleb128 0xb
+ 2126 00de 0B       		.uleb128 0xb
+ 2127 00df 49       		.uleb128 0x49
+ 2128 00e0 13       		.uleb128 0x13
+ 2129 00e1 3A       		.uleb128 0x3a
+ 2130 00e2 0B       		.uleb128 0xb
+ 2131 00e3 3B       		.uleb128 0x3b
+ 2132 00e4 0B       		.uleb128 0xb
+ 2133 00e5 01       		.uleb128 0x1
+ 2134 00e6 13       		.uleb128 0x13
+ 2135 00e7 00       		.byte	0
+ 2136 00e8 00       		.byte	0
+ 2137 00e9 14       		.uleb128 0x14
+ 2138 00ea 13       		.uleb128 0x13
+ 2139 00eb 01       		.byte	0x1
+ 2140 00ec 0B       		.uleb128 0xb
+ 2141 00ed 0B       		.uleb128 0xb
+ 2142 00ee 3A       		.uleb128 0x3a
+ 2143 00ef 0B       		.uleb128 0xb
+ 2144 00f0 3B       		.uleb128 0x3b
+ 2145 00f1 0B       		.uleb128 0xb
+ 2146 00f2 01       		.uleb128 0x1
+ 2147 00f3 13       		.uleb128 0x13
+ 2148 00f4 00       		.byte	0
+ 2149 00f5 00       		.byte	0
+ 2150 00f6 15       		.uleb128 0x15
+ 2151 00f7 2E       		.uleb128 0x2e
+ 2152 00f8 01       		.byte	0x1
+ 2153 00f9 3F       		.uleb128 0x3f
+ 2154 00fa 19       		.uleb128 0x19
+ 2155 00fb 03       		.uleb128 0x3
+ 2156 00fc 0E       		.uleb128 0xe
+ 2157 00fd 3A       		.uleb128 0x3a
+ 2158 00fe 0B       		.uleb128 0xb
+ 2159 00ff 3B       		.uleb128 0x3b
+ 2160 0100 0B       		.uleb128 0xb
+ 2161 0101 27       		.uleb128 0x27
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 48
+
+
+ 2162 0102 19       		.uleb128 0x19
+ 2163 0103 11       		.uleb128 0x11
+ 2164 0104 01       		.uleb128 0x1
+ 2165 0105 12       		.uleb128 0x12
+ 2166 0106 06       		.uleb128 0x6
+ 2167 0107 40       		.uleb128 0x40
+ 2168 0108 18       		.uleb128 0x18
+ 2169 0109 9742     		.uleb128 0x2117
+ 2170 010b 19       		.uleb128 0x19
+ 2171 010c 01       		.uleb128 0x1
+ 2172 010d 13       		.uleb128 0x13
+ 2173 010e 00       		.byte	0
+ 2174 010f 00       		.byte	0
+ 2175 0110 16       		.uleb128 0x16
+ 2176 0111 05       		.uleb128 0x5
+ 2177 0112 00       		.byte	0
+ 2178 0113 03       		.uleb128 0x3
+ 2179 0114 0E       		.uleb128 0xe
+ 2180 0115 3A       		.uleb128 0x3a
+ 2181 0116 0B       		.uleb128 0xb
+ 2182 0117 3B       		.uleb128 0x3b
+ 2183 0118 0B       		.uleb128 0xb
+ 2184 0119 49       		.uleb128 0x49
+ 2185 011a 13       		.uleb128 0x13
+ 2186 011b 02       		.uleb128 0x2
+ 2187 011c 17       		.uleb128 0x17
+ 2188 011d 00       		.byte	0
+ 2189 011e 00       		.byte	0
+ 2190 011f 17       		.uleb128 0x17
+ 2191 0120 898201   		.uleb128 0x4109
+ 2192 0123 00       		.byte	0
+ 2193 0124 11       		.uleb128 0x11
+ 2194 0125 01       		.uleb128 0x1
+ 2195 0126 31       		.uleb128 0x31
+ 2196 0127 13       		.uleb128 0x13
+ 2197 0128 00       		.byte	0
+ 2198 0129 00       		.byte	0
+ 2199 012a 18       		.uleb128 0x18
+ 2200 012b 898201   		.uleb128 0x4109
+ 2201 012e 01       		.byte	0x1
+ 2202 012f 11       		.uleb128 0x11
+ 2203 0130 01       		.uleb128 0x1
+ 2204 0131 31       		.uleb128 0x31
+ 2205 0132 13       		.uleb128 0x13
+ 2206 0133 00       		.byte	0
+ 2207 0134 00       		.byte	0
+ 2208 0135 19       		.uleb128 0x19
+ 2209 0136 8A8201   		.uleb128 0x410a
+ 2210 0139 00       		.byte	0
+ 2211 013a 02       		.uleb128 0x2
+ 2212 013b 18       		.uleb128 0x18
+ 2213 013c 9142     		.uleb128 0x2111
+ 2214 013e 18       		.uleb128 0x18
+ 2215 013f 00       		.byte	0
+ 2216 0140 00       		.byte	0
+ 2217 0141 1A       		.uleb128 0x1a
+ 2218 0142 2E       		.uleb128 0x2e
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 49
+
+
+ 2219 0143 01       		.byte	0x1
+ 2220 0144 3F       		.uleb128 0x3f
+ 2221 0145 19       		.uleb128 0x19
+ 2222 0146 03       		.uleb128 0x3
+ 2223 0147 0E       		.uleb128 0xe
+ 2224 0148 3A       		.uleb128 0x3a
+ 2225 0149 0B       		.uleb128 0xb
+ 2226 014a 3B       		.uleb128 0x3b
+ 2227 014b 0B       		.uleb128 0xb
+ 2228 014c 27       		.uleb128 0x27
+ 2229 014d 19       		.uleb128 0x19
+ 2230 014e 49       		.uleb128 0x49
+ 2231 014f 13       		.uleb128 0x13
+ 2232 0150 11       		.uleb128 0x11
+ 2233 0151 01       		.uleb128 0x1
+ 2234 0152 12       		.uleb128 0x12
+ 2235 0153 06       		.uleb128 0x6
+ 2236 0154 40       		.uleb128 0x40
+ 2237 0155 18       		.uleb128 0x18
+ 2238 0156 9742     		.uleb128 0x2117
+ 2239 0158 19       		.uleb128 0x19
+ 2240 0159 01       		.uleb128 0x1
+ 2241 015a 13       		.uleb128 0x13
+ 2242 015b 00       		.byte	0
+ 2243 015c 00       		.byte	0
+ 2244 015d 1B       		.uleb128 0x1b
+ 2245 015e 34       		.uleb128 0x34
+ 2246 015f 00       		.byte	0
+ 2247 0160 03       		.uleb128 0x3
+ 2248 0161 0E       		.uleb128 0xe
+ 2249 0162 3A       		.uleb128 0x3a
+ 2250 0163 0B       		.uleb128 0xb
+ 2251 0164 3B       		.uleb128 0x3b
+ 2252 0165 0B       		.uleb128 0xb
+ 2253 0166 49       		.uleb128 0x49
+ 2254 0167 13       		.uleb128 0x13
+ 2255 0168 02       		.uleb128 0x2
+ 2256 0169 17       		.uleb128 0x17
+ 2257 016a 00       		.byte	0
+ 2258 016b 00       		.byte	0
+ 2259 016c 1C       		.uleb128 0x1c
+ 2260 016d 898201   		.uleb128 0x4109
+ 2261 0170 01       		.byte	0x1
+ 2262 0171 11       		.uleb128 0x11
+ 2263 0172 01       		.uleb128 0x1
+ 2264 0173 31       		.uleb128 0x31
+ 2265 0174 13       		.uleb128 0x13
+ 2266 0175 01       		.uleb128 0x1
+ 2267 0176 13       		.uleb128 0x13
+ 2268 0177 00       		.byte	0
+ 2269 0178 00       		.byte	0
+ 2270 0179 1D       		.uleb128 0x1d
+ 2271 017a 2E       		.uleb128 0x2e
+ 2272 017b 01       		.byte	0x1
+ 2273 017c 3F       		.uleb128 0x3f
+ 2274 017d 19       		.uleb128 0x19
+ 2275 017e 03       		.uleb128 0x3
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 50
+
+
+ 2276 017f 0E       		.uleb128 0xe
+ 2277 0180 3A       		.uleb128 0x3a
+ 2278 0181 0B       		.uleb128 0xb
+ 2279 0182 3B       		.uleb128 0x3b
+ 2280 0183 05       		.uleb128 0x5
+ 2281 0184 27       		.uleb128 0x27
+ 2282 0185 19       		.uleb128 0x19
+ 2283 0186 11       		.uleb128 0x11
+ 2284 0187 01       		.uleb128 0x1
+ 2285 0188 12       		.uleb128 0x12
+ 2286 0189 06       		.uleb128 0x6
+ 2287 018a 40       		.uleb128 0x40
+ 2288 018b 18       		.uleb128 0x18
+ 2289 018c 9742     		.uleb128 0x2117
+ 2290 018e 19       		.uleb128 0x19
+ 2291 018f 01       		.uleb128 0x1
+ 2292 0190 13       		.uleb128 0x13
+ 2293 0191 00       		.byte	0
+ 2294 0192 00       		.byte	0
+ 2295 0193 1E       		.uleb128 0x1e
+ 2296 0194 05       		.uleb128 0x5
+ 2297 0195 00       		.byte	0
+ 2298 0196 03       		.uleb128 0x3
+ 2299 0197 0E       		.uleb128 0xe
+ 2300 0198 3A       		.uleb128 0x3a
+ 2301 0199 0B       		.uleb128 0xb
+ 2302 019a 3B       		.uleb128 0x3b
+ 2303 019b 05       		.uleb128 0x5
+ 2304 019c 49       		.uleb128 0x49
+ 2305 019d 13       		.uleb128 0x13
+ 2306 019e 02       		.uleb128 0x2
+ 2307 019f 17       		.uleb128 0x17
+ 2308 01a0 00       		.byte	0
+ 2309 01a1 00       		.byte	0
+ 2310 01a2 1F       		.uleb128 0x1f
+ 2311 01a3 34       		.uleb128 0x34
+ 2312 01a4 00       		.byte	0
+ 2313 01a5 03       		.uleb128 0x3
+ 2314 01a6 0E       		.uleb128 0xe
+ 2315 01a7 3A       		.uleb128 0x3a
+ 2316 01a8 0B       		.uleb128 0xb
+ 2317 01a9 3B       		.uleb128 0x3b
+ 2318 01aa 05       		.uleb128 0x5
+ 2319 01ab 49       		.uleb128 0x49
+ 2320 01ac 13       		.uleb128 0x13
+ 2321 01ad 02       		.uleb128 0x2
+ 2322 01ae 17       		.uleb128 0x17
+ 2323 01af 00       		.byte	0
+ 2324 01b0 00       		.byte	0
+ 2325 01b1 20       		.uleb128 0x20
+ 2326 01b2 05       		.uleb128 0x5
+ 2327 01b3 00       		.byte	0
+ 2328 01b4 03       		.uleb128 0x3
+ 2329 01b5 0E       		.uleb128 0xe
+ 2330 01b6 3A       		.uleb128 0x3a
+ 2331 01b7 0B       		.uleb128 0xb
+ 2332 01b8 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 51
+
+
+ 2333 01b9 05       		.uleb128 0x5
+ 2334 01ba 49       		.uleb128 0x49
+ 2335 01bb 13       		.uleb128 0x13
+ 2336 01bc 02       		.uleb128 0x2
+ 2337 01bd 18       		.uleb128 0x18
+ 2338 01be 00       		.byte	0
+ 2339 01bf 00       		.byte	0
+ 2340 01c0 21       		.uleb128 0x21
+ 2341 01c1 34       		.uleb128 0x34
+ 2342 01c2 00       		.byte	0
+ 2343 01c3 03       		.uleb128 0x3
+ 2344 01c4 0E       		.uleb128 0xe
+ 2345 01c5 3A       		.uleb128 0x3a
+ 2346 01c6 0B       		.uleb128 0xb
+ 2347 01c7 3B       		.uleb128 0x3b
+ 2348 01c8 05       		.uleb128 0x5
+ 2349 01c9 49       		.uleb128 0x49
+ 2350 01ca 13       		.uleb128 0x13
+ 2351 01cb 3F       		.uleb128 0x3f
+ 2352 01cc 19       		.uleb128 0x19
+ 2353 01cd 3C       		.uleb128 0x3c
+ 2354 01ce 19       		.uleb128 0x19
+ 2355 01cf 00       		.byte	0
+ 2356 01d0 00       		.byte	0
+ 2357 01d1 22       		.uleb128 0x22
+ 2358 01d2 01       		.uleb128 0x1
+ 2359 01d3 01       		.byte	0x1
+ 2360 01d4 49       		.uleb128 0x49
+ 2361 01d5 13       		.uleb128 0x13
+ 2362 01d6 01       		.uleb128 0x1
+ 2363 01d7 13       		.uleb128 0x13
+ 2364 01d8 00       		.byte	0
+ 2365 01d9 00       		.byte	0
+ 2366 01da 23       		.uleb128 0x23
+ 2367 01db 21       		.uleb128 0x21
+ 2368 01dc 00       		.byte	0
+ 2369 01dd 49       		.uleb128 0x49
+ 2370 01de 13       		.uleb128 0x13
+ 2371 01df 2F       		.uleb128 0x2f
+ 2372 01e0 0B       		.uleb128 0xb
+ 2373 01e1 00       		.byte	0
+ 2374 01e2 00       		.byte	0
+ 2375 01e3 24       		.uleb128 0x24
+ 2376 01e4 34       		.uleb128 0x34
+ 2377 01e5 00       		.byte	0
+ 2378 01e6 03       		.uleb128 0x3
+ 2379 01e7 0E       		.uleb128 0xe
+ 2380 01e8 3A       		.uleb128 0x3a
+ 2381 01e9 0B       		.uleb128 0xb
+ 2382 01ea 3B       		.uleb128 0x3b
+ 2383 01eb 0B       		.uleb128 0xb
+ 2384 01ec 49       		.uleb128 0x49
+ 2385 01ed 13       		.uleb128 0x13
+ 2386 01ee 3F       		.uleb128 0x3f
+ 2387 01ef 19       		.uleb128 0x19
+ 2388 01f0 3C       		.uleb128 0x3c
+ 2389 01f1 19       		.uleb128 0x19
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 52
+
+
+ 2390 01f2 00       		.byte	0
+ 2391 01f3 00       		.byte	0
+ 2392 01f4 25       		.uleb128 0x25
+ 2393 01f5 26       		.uleb128 0x26
+ 2394 01f6 00       		.byte	0
+ 2395 01f7 49       		.uleb128 0x49
+ 2396 01f8 13       		.uleb128 0x13
+ 2397 01f9 00       		.byte	0
+ 2398 01fa 00       		.byte	0
+ 2399 01fb 26       		.uleb128 0x26
+ 2400 01fc 2E       		.uleb128 0x2e
+ 2401 01fd 00       		.byte	0
+ 2402 01fe 3F       		.uleb128 0x3f
+ 2403 01ff 19       		.uleb128 0x19
+ 2404 0200 3C       		.uleb128 0x3c
+ 2405 0201 19       		.uleb128 0x19
+ 2406 0202 6E       		.uleb128 0x6e
+ 2407 0203 0E       		.uleb128 0xe
+ 2408 0204 03       		.uleb128 0x3
+ 2409 0205 0E       		.uleb128 0xe
+ 2410 0206 3A       		.uleb128 0x3a
+ 2411 0207 0B       		.uleb128 0xb
+ 2412 0208 3B       		.uleb128 0x3b
+ 2413 0209 0B       		.uleb128 0xb
+ 2414 020a 00       		.byte	0
+ 2415 020b 00       		.byte	0
+ 2416 020c 27       		.uleb128 0x27
+ 2417 020d 2E       		.uleb128 0x2e
+ 2418 020e 00       		.byte	0
+ 2419 020f 3F       		.uleb128 0x3f
+ 2420 0210 19       		.uleb128 0x19
+ 2421 0211 3C       		.uleb128 0x3c
+ 2422 0212 19       		.uleb128 0x19
+ 2423 0213 6E       		.uleb128 0x6e
+ 2424 0214 0E       		.uleb128 0xe
+ 2425 0215 03       		.uleb128 0x3
+ 2426 0216 0E       		.uleb128 0xe
+ 2427 0217 00       		.byte	0
+ 2428 0218 00       		.byte	0
+ 2429 0219 00       		.byte	0
+ 2430              		.section	.debug_loc,"",%progbits
+ 2431              	.Ldebug_loc0:
+ 2432              	.LLST0:
+ 2433 0000 00000000 		.4byte	.LVL0
+ 2434 0004 07000000 		.4byte	.LVL1-1
+ 2435 0008 0100     		.2byte	0x1
+ 2436 000a 50       		.byte	0x50
+ 2437 000b 07000000 		.4byte	.LVL1-1
+ 2438 000f 10000000 		.4byte	.LFE648
+ 2439 0013 0400     		.2byte	0x4
+ 2440 0015 F3       		.byte	0xf3
+ 2441 0016 01       		.uleb128 0x1
+ 2442 0017 50       		.byte	0x50
+ 2443 0018 9F       		.byte	0x9f
+ 2444 0019 00000000 		.4byte	0
+ 2445 001d 00000000 		.4byte	0
+ 2446              	.LLST1:
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 53
+
+
+ 2447 0021 00000000 		.4byte	.LVL3
+ 2448 0025 07000000 		.4byte	.LVL5-1
+ 2449 0029 0100     		.2byte	0x1
+ 2450 002b 50       		.byte	0x50
+ 2451 002c 07000000 		.4byte	.LVL5-1
+ 2452 0030 0A000000 		.4byte	.LVL6
+ 2453 0034 0400     		.2byte	0x4
+ 2454 0036 F3       		.byte	0xf3
+ 2455 0037 01       		.uleb128 0x1
+ 2456 0038 50       		.byte	0x50
+ 2457 0039 9F       		.byte	0x9f
+ 2458 003a 0A000000 		.4byte	.LVL6
+ 2459 003e 0D000000 		.4byte	.LVL7-1
+ 2460 0042 0100     		.2byte	0x1
+ 2461 0044 50       		.byte	0x50
+ 2462 0045 0D000000 		.4byte	.LVL7-1
+ 2463 0049 18000000 		.4byte	.LFE649
+ 2464 004d 0400     		.2byte	0x4
+ 2465 004f F3       		.byte	0xf3
+ 2466 0050 01       		.uleb128 0x1
+ 2467 0051 50       		.byte	0x50
+ 2468 0052 9F       		.byte	0x9f
+ 2469 0053 00000000 		.4byte	0
+ 2470 0057 00000000 		.4byte	0
+ 2471              	.LLST2:
+ 2472 005b 02000000 		.4byte	.LVL4
+ 2473 005f 08000000 		.4byte	.LVL5
+ 2474 0063 0200     		.2byte	0x2
+ 2475 0065 30       		.byte	0x30
+ 2476 0066 9F       		.byte	0x9f
+ 2477 0067 08000000 		.4byte	.LVL5
+ 2478 006b 0A000000 		.4byte	.LVL6
+ 2479 006f 0100     		.2byte	0x1
+ 2480 0071 50       		.byte	0x50
+ 2481 0072 0A000000 		.4byte	.LVL6
+ 2482 0076 0E000000 		.4byte	.LVL7
+ 2483 007a 0200     		.2byte	0x2
+ 2484 007c 30       		.byte	0x30
+ 2485 007d 9F       		.byte	0x9f
+ 2486 007e 0E000000 		.4byte	.LVL7
+ 2487 0082 12000000 		.4byte	.LVL8
+ 2488 0086 0100     		.2byte	0x1
+ 2489 0088 50       		.byte	0x50
+ 2490 0089 14000000 		.4byte	.LVL9
+ 2491 008d 18000000 		.4byte	.LFE649
+ 2492 0091 0100     		.2byte	0x1
+ 2493 0093 50       		.byte	0x50
+ 2494 0094 00000000 		.4byte	0
+ 2495 0098 00000000 		.4byte	0
+ 2496              	.LLST3:
+ 2497 009c 00000000 		.4byte	.LVL11
+ 2498 00a0 0A000000 		.4byte	.LVL12
+ 2499 00a4 0100     		.2byte	0x1
+ 2500 00a6 50       		.byte	0x50
+ 2501 00a7 0A000000 		.4byte	.LVL12
+ 2502 00ab 44000000 		.4byte	.LFE650
+ 2503 00af 0400     		.2byte	0x4
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 54
+
+
+ 2504 00b1 F3       		.byte	0xf3
+ 2505 00b2 01       		.uleb128 0x1
+ 2506 00b3 50       		.byte	0x50
+ 2507 00b4 9F       		.byte	0x9f
+ 2508 00b5 00000000 		.4byte	0
+ 2509 00b9 00000000 		.4byte	0
+ 2510              	.LLST4:
+ 2511 00bd 00000000 		.4byte	.LVL11
+ 2512 00c1 0D000000 		.4byte	.LVL13-1
+ 2513 00c5 0100     		.2byte	0x1
+ 2514 00c7 51       		.byte	0x51
+ 2515 00c8 0D000000 		.4byte	.LVL13-1
+ 2516 00cc 44000000 		.4byte	.LFE650
+ 2517 00d0 0400     		.2byte	0x4
+ 2518 00d2 F3       		.byte	0xf3
+ 2519 00d3 01       		.uleb128 0x1
+ 2520 00d4 51       		.byte	0x51
+ 2521 00d5 9F       		.byte	0x9f
+ 2522 00d6 00000000 		.4byte	0
+ 2523 00da 00000000 		.4byte	0
+ 2524              	.LLST5:
+ 2525 00de 00000000 		.4byte	.LVL19
+ 2526 00e2 0E000000 		.4byte	.LVL20
+ 2527 00e6 0100     		.2byte	0x1
+ 2528 00e8 50       		.byte	0x50
+ 2529 00e9 0E000000 		.4byte	.LVL20
+ 2530 00ed 54000000 		.4byte	.LFE651
+ 2531 00f1 0100     		.2byte	0x1
+ 2532 00f3 57       		.byte	0x57
+ 2533 00f4 00000000 		.4byte	0
+ 2534 00f8 00000000 		.4byte	0
+ 2535              	.LLST6:
+ 2536 00fc 00000000 		.4byte	.LVL19
+ 2537 0100 11000000 		.4byte	.LVL21-1
+ 2538 0104 0100     		.2byte	0x1
+ 2539 0106 51       		.byte	0x51
+ 2540 0107 11000000 		.4byte	.LVL21-1
+ 2541 010b 54000000 		.4byte	.LFE651
+ 2542 010f 0100     		.2byte	0x1
+ 2543 0111 56       		.byte	0x56
+ 2544 0112 00000000 		.4byte	0
+ 2545 0116 00000000 		.4byte	0
+ 2546              	.LLST7:
+ 2547 011a 00000000 		.4byte	.LVL19
+ 2548 011e 11000000 		.4byte	.LVL21-1
+ 2549 0122 0100     		.2byte	0x1
+ 2550 0124 52       		.byte	0x52
+ 2551 0125 11000000 		.4byte	.LVL21-1
+ 2552 0129 54000000 		.4byte	.LFE651
+ 2553 012d 0400     		.2byte	0x4
+ 2554 012f F3       		.byte	0xf3
+ 2555 0130 01       		.uleb128 0x1
+ 2556 0131 52       		.byte	0x52
+ 2557 0132 9F       		.byte	0x9f
+ 2558 0133 00000000 		.4byte	0
+ 2559 0137 00000000 		.4byte	0
+ 2560              	.LLST8:
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 55
+
+
+ 2561 013b 00000000 		.4byte	.LVL19
+ 2562 013f 11000000 		.4byte	.LVL21-1
+ 2563 0143 0100     		.2byte	0x1
+ 2564 0145 53       		.byte	0x53
+ 2565 0146 11000000 		.4byte	.LVL21-1
+ 2566 014a 54000000 		.4byte	.LFE651
+ 2567 014e 0400     		.2byte	0x4
+ 2568 0150 F3       		.byte	0xf3
+ 2569 0151 01       		.uleb128 0x1
+ 2570 0152 53       		.byte	0x53
+ 2571 0153 9F       		.byte	0x9f
+ 2572 0154 00000000 		.4byte	0
+ 2573 0158 00000000 		.4byte	0
+ 2574              	.LLST9:
+ 2575 015c 00000000 		.4byte	.LVL28
+ 2576 0160 0C000000 		.4byte	.LVL30
+ 2577 0164 0100     		.2byte	0x1
+ 2578 0166 50       		.byte	0x50
+ 2579 0167 0C000000 		.4byte	.LVL30
+ 2580 016b 30000000 		.4byte	.LFE652
+ 2581 016f 0100     		.2byte	0x1
+ 2582 0171 57       		.byte	0x57
+ 2583 0172 00000000 		.4byte	0
+ 2584 0176 00000000 		.4byte	0
+ 2585              	.LLST10:
+ 2586 017a 00000000 		.4byte	.LVL28
+ 2587 017e 0C000000 		.4byte	.LVL30
+ 2588 0182 0100     		.2byte	0x1
+ 2589 0184 51       		.byte	0x51
+ 2590 0185 0C000000 		.4byte	.LVL30
+ 2591 0189 30000000 		.4byte	.LFE652
+ 2592 018d 0100     		.2byte	0x1
+ 2593 018f 56       		.byte	0x56
+ 2594 0190 00000000 		.4byte	0
+ 2595 0194 00000000 		.4byte	0
+ 2596              	.LLST11:
+ 2597 0198 00000000 		.4byte	.LVL28
+ 2598 019c 0C000000 		.4byte	.LVL30
+ 2599 01a0 0100     		.2byte	0x1
+ 2600 01a2 52       		.byte	0x52
+ 2601 01a3 0C000000 		.4byte	.LVL30
+ 2602 01a7 30000000 		.4byte	.LFE652
+ 2603 01ab 0100     		.2byte	0x1
+ 2604 01ad 55       		.byte	0x55
+ 2605 01ae 00000000 		.4byte	0
+ 2606 01b2 00000000 		.4byte	0
+ 2607              	.LLST12:
+ 2608 01b6 0A000000 		.4byte	.LVL29
+ 2609 01ba 26000000 		.4byte	.LVL35
+ 2610 01be 0100     		.2byte	0x1
+ 2611 01c0 54       		.byte	0x54
+ 2612 01c1 28000000 		.4byte	.LVL36
+ 2613 01c5 30000000 		.4byte	.LFE652
+ 2614 01c9 0100     		.2byte	0x1
+ 2615 01cb 54       		.byte	0x54
+ 2616 01cc 00000000 		.4byte	0
+ 2617 01d0 00000000 		.4byte	0
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 56
+
+
+ 2618              	.LLST13:
+ 2619 01d4 16000000 		.4byte	.LVL31
+ 2620 01d8 20000000 		.4byte	.LVL33
+ 2621 01dc 0100     		.2byte	0x1
+ 2622 01de 50       		.byte	0x50
+ 2623 01df 20000000 		.4byte	.LVL33
+ 2624 01e3 23000000 		.4byte	.LVL34-1
+ 2625 01e7 1000     		.2byte	0x10
+ 2626 01e9 74       		.byte	0x74
+ 2627 01ea 00       		.sleb128 0
+ 2628 01eb 35       		.byte	0x35
+ 2629 01ec 24       		.byte	0x24
+ 2630 01ed 75       		.byte	0x75
+ 2631 01ee 00       		.sleb128 0
+ 2632 01ef 94       		.byte	0x94
+ 2633 01f0 01       		.byte	0x1
+ 2634 01f1 08       		.byte	0x8
+ 2635 01f2 FF       		.byte	0xff
+ 2636 01f3 1A       		.byte	0x1a
+ 2637 01f4 22       		.byte	0x22
+ 2638 01f5 74       		.byte	0x74
+ 2639 01f6 00       		.sleb128 0
+ 2640 01f7 22       		.byte	0x22
+ 2641 01f8 9F       		.byte	0x9f
+ 2642 01f9 00000000 		.4byte	0
+ 2643 01fd 00000000 		.4byte	0
+ 2644              	.LLST14:
+ 2645 0201 1A000000 		.4byte	.LVL32
+ 2646 0205 23000000 		.4byte	.LVL34-1
+ 2647 0209 0100     		.2byte	0x1
+ 2648 020b 52       		.byte	0x52
+ 2649 020c 00000000 		.4byte	0
+ 2650 0210 00000000 		.4byte	0
+ 2651              	.LLST15:
+ 2652 0214 00000000 		.4byte	.LVL37
+ 2653 0218 08000000 		.4byte	.LVL39
+ 2654 021c 0100     		.2byte	0x1
+ 2655 021e 51       		.byte	0x51
+ 2656 021f 08000000 		.4byte	.LVL39
+ 2657 0223 18010000 		.4byte	.LFE653
+ 2658 0227 0400     		.2byte	0x4
+ 2659 0229 F3       		.byte	0xf3
+ 2660 022a 01       		.uleb128 0x1
+ 2661 022b 51       		.byte	0x51
+ 2662 022c 9F       		.byte	0x9f
+ 2663 022d 00000000 		.4byte	0
+ 2664 0231 00000000 		.4byte	0
+ 2665              	.LLST16:
+ 2666 0235 06000000 		.4byte	.LVL38
+ 2667 0239 08000000 		.4byte	.LVL39
+ 2668 023d 0100     		.2byte	0x1
+ 2669 023f 51       		.byte	0x51
+ 2670 0240 08000000 		.4byte	.LVL39
+ 2671 0244 18010000 		.4byte	.LFE653
+ 2672 0248 0100     		.2byte	0x1
+ 2673 024a 5A       		.byte	0x5a
+ 2674 024b 00000000 		.4byte	0
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 57
+
+
+ 2675 024f 00000000 		.4byte	0
+ 2676              	.LLST17:
+ 2677 0253 36000000 		.4byte	.LVL40
+ 2678 0257 E6000000 		.4byte	.LVL64
+ 2679 025b 0100     		.2byte	0x1
+ 2680 025d 57       		.byte	0x57
+ 2681 025e 00000000 		.4byte	0
+ 2682 0262 00000000 		.4byte	0
+ 2683              	.LLST18:
+ 2684 0266 4E000000 		.4byte	.LVL41
+ 2685 026a A4000000 		.4byte	.LVL54
+ 2686 026e 0100     		.2byte	0x1
+ 2687 0270 5C       		.byte	0x5c
+ 2688 0271 00000000 		.4byte	0
+ 2689 0275 00000000 		.4byte	0
+ 2690              	.LLST19:
+ 2691 0279 66000000 		.4byte	.LVL43
+ 2692 027d 8A000000 		.4byte	.LVL50
+ 2693 0281 0100     		.2byte	0x1
+ 2694 0283 55       		.byte	0x55
+ 2695 0284 AE000000 		.4byte	.LVL55
+ 2696 0288 D0000000 		.4byte	.LVL58
+ 2697 028c 0100     		.2byte	0x1
+ 2698 028e 54       		.byte	0x54
+ 2699 028f 00000000 		.4byte	0
+ 2700 0293 00000000 		.4byte	0
+ 2701              	.LLST20:
+ 2702 0297 6E000000 		.4byte	.LVL44
+ 2703 029b 76000000 		.4byte	.LVL45
+ 2704 029f 0100     		.2byte	0x1
+ 2705 02a1 54       		.byte	0x54
+ 2706 02a2 76000000 		.4byte	.LVL45
+ 2707 02a6 7C000000 		.4byte	.LVL46
+ 2708 02aa 1000     		.2byte	0x10
+ 2709 02ac 7E       		.byte	0x7e
+ 2710 02ad 00       		.sleb128 0
+ 2711 02ae 0A       		.byte	0xa
+ 2712 02af FFFF     		.2byte	0xffff
+ 2713 02b1 1A       		.byte	0x1a
+ 2714 02b2 79       		.byte	0x79
+ 2715 02b3 00       		.sleb128 0
+ 2716 02b4 1E       		.byte	0x1e
+ 2717 02b5 78       		.byte	0x78
+ 2718 02b6 00       		.sleb128 0
+ 2719 02b7 22       		.byte	0x22
+ 2720 02b8 7C       		.byte	0x7c
+ 2721 02b9 00       		.sleb128 0
+ 2722 02ba 22       		.byte	0x22
+ 2723 02bb 9F       		.byte	0x9f
+ 2724 02bc 7C000000 		.4byte	.LVL46
+ 2725 02c0 82000000 		.4byte	.LVL47
+ 2726 02c4 0100     		.2byte	0x1
+ 2727 02c6 54       		.byte	0x54
+ 2728 02c7 82000000 		.4byte	.LVL47
+ 2729 02cb 8A000000 		.4byte	.LVL50
+ 2730 02cf 1000     		.2byte	0x10
+ 2731 02d1 7E       		.byte	0x7e
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 58
+
+
+ 2732 02d2 00       		.sleb128 0
+ 2733 02d3 0A       		.byte	0xa
+ 2734 02d4 FFFF     		.2byte	0xffff
+ 2735 02d6 1A       		.byte	0x1a
+ 2736 02d7 79       		.byte	0x79
+ 2737 02d8 00       		.sleb128 0
+ 2738 02d9 1E       		.byte	0x1e
+ 2739 02da 78       		.byte	0x78
+ 2740 02db 00       		.sleb128 0
+ 2741 02dc 22       		.byte	0x22
+ 2742 02dd 7C       		.byte	0x7c
+ 2743 02de 00       		.sleb128 0
+ 2744 02df 22       		.byte	0x22
+ 2745 02e0 9F       		.byte	0x9f
+ 2746 02e1 00000000 		.4byte	0
+ 2747 02e5 00000000 		.4byte	0
+ 2748              	.LLST21:
+ 2749 02e9 4E000000 		.4byte	.LVL41
+ 2750 02ed 54000000 		.4byte	.LVL42
+ 2751 02f1 0200     		.2byte	0x2
+ 2752 02f3 30       		.byte	0x30
+ 2753 02f4 9F       		.byte	0x9f
+ 2754 02f5 54000000 		.4byte	.LVL42
+ 2755 02f9 98000000 		.4byte	.LVL52
+ 2756 02fd 0100     		.2byte	0x1
+ 2757 02ff 5E       		.byte	0x5e
+ 2758 0300 9C000000 		.4byte	.LVL53
+ 2759 0304 A4000000 		.4byte	.LVL54
+ 2760 0308 0100     		.2byte	0x1
+ 2761 030a 5E       		.byte	0x5e
+ 2762 030b A4000000 		.4byte	.LVL54
+ 2763 030f DA000000 		.4byte	.LVL60
+ 2764 0313 0100     		.2byte	0x1
+ 2765 0315 56       		.byte	0x56
+ 2766 0316 DC000000 		.4byte	.LVL61
+ 2767 031a DE000000 		.4byte	.LVL62
+ 2768 031e 0100     		.2byte	0x1
+ 2769 0320 56       		.byte	0x56
+ 2770 0321 E0000000 		.4byte	.LVL63
+ 2771 0325 E6000000 		.4byte	.LVL64
+ 2772 0329 0100     		.2byte	0x1
+ 2773 032b 56       		.byte	0x56
+ 2774 032c 00000000 		.4byte	0
+ 2775 0330 00000000 		.4byte	0
+ 2776              	.LLST22:
+ 2777 0334 54000000 		.4byte	.LVL42
+ 2778 0338 86000000 		.4byte	.LVL48
+ 2779 033c 0100     		.2byte	0x1
+ 2780 033e 56       		.byte	0x56
+ 2781 033f 88000000 		.4byte	.LVL49
+ 2782 0343 8A000000 		.4byte	.LVL50
+ 2783 0347 0100     		.2byte	0x1
+ 2784 0349 56       		.byte	0x56
+ 2785 034a 8C000000 		.4byte	.LVL51
+ 2786 034e 9C000000 		.4byte	.LVL53
+ 2787 0352 0100     		.2byte	0x1
+ 2788 0354 56       		.byte	0x56
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 59
+
+
+ 2789 0355 A4000000 		.4byte	.LVL54
+ 2790 0359 CC000000 		.4byte	.LVL56
+ 2791 035d 0100     		.2byte	0x1
+ 2792 035f 55       		.byte	0x55
+ 2793 0360 CE000000 		.4byte	.LVL57
+ 2794 0364 D0000000 		.4byte	.LVL58
+ 2795 0368 0100     		.2byte	0x1
+ 2796 036a 55       		.byte	0x55
+ 2797 036b D2000000 		.4byte	.LVL59
+ 2798 036f DE000000 		.4byte	.LVL62
+ 2799 0373 0100     		.2byte	0x1
+ 2800 0375 55       		.byte	0x55
+ 2801 0376 00000000 		.4byte	0
+ 2802 037a 00000000 		.4byte	0
+ 2803              		.section	.debug_aranges,"",%progbits
+ 2804 0000 44000000 		.4byte	0x44
+ 2805 0004 0200     		.2byte	0x2
+ 2806 0006 00000000 		.4byte	.Ldebug_info0
+ 2807 000a 04       		.byte	0x4
+ 2808 000b 00       		.byte	0
+ 2809 000c 0000     		.2byte	0
+ 2810 000e 0000     		.2byte	0
+ 2811 0010 00000000 		.4byte	.LFB648
+ 2812 0014 10000000 		.4byte	.LFE648-.LFB648
+ 2813 0018 00000000 		.4byte	.LFB649
+ 2814 001c 18000000 		.4byte	.LFE649-.LFB649
+ 2815 0020 00000000 		.4byte	.LFB650
+ 2816 0024 44000000 		.4byte	.LFE650-.LFB650
+ 2817 0028 00000000 		.4byte	.LFB651
+ 2818 002c 54000000 		.4byte	.LFE651-.LFB651
+ 2819 0030 00000000 		.4byte	.LFB652
+ 2820 0034 30000000 		.4byte	.LFE652-.LFB652
+ 2821 0038 00000000 		.4byte	.LFB653
+ 2822 003c 18010000 		.4byte	.LFE653-.LFB653
+ 2823 0040 00000000 		.4byte	0
+ 2824 0044 00000000 		.4byte	0
+ 2825              		.section	.debug_ranges,"",%progbits
+ 2826              	.Ldebug_ranges0:
+ 2827 0000 00000000 		.4byte	.LFB648
+ 2828 0004 10000000 		.4byte	.LFE648
+ 2829 0008 00000000 		.4byte	.LFB649
+ 2830 000c 18000000 		.4byte	.LFE649
+ 2831 0010 00000000 		.4byte	.LFB650
+ 2832 0014 44000000 		.4byte	.LFE650
+ 2833 0018 00000000 		.4byte	.LFB651
+ 2834 001c 54000000 		.4byte	.LFE651
+ 2835 0020 00000000 		.4byte	.LFB652
+ 2836 0024 30000000 		.4byte	.LFE652
+ 2837 0028 00000000 		.4byte	.LFB653
+ 2838 002c 18010000 		.4byte	.LFE653
+ 2839 0030 00000000 		.4byte	0
+ 2840 0034 00000000 		.4byte	0
+ 2841              		.section	.debug_line,"",%progbits
+ 2842              	.Ldebug_line0:
+ 2843 0000 EA030000 		.section	.debug_str,"MS",%progbits,1
+ 2843      0200EB02 
+ 2843      00000201 
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 60
+
+
+ 2843      FB0E0D00 
+ 2843      01010101 
+ 2844              	.LASF27:
+ 2845 0000 72756E4D 		.ascii	"runMode\000"
+ 2845      6F646500 
+ 2846              	.LASF115:
+ 2847 0008 794F6666 		.ascii	"yOffset\000"
+ 2847      73657400 
+ 2848              	.LASF78:
+ 2849 0010 72784275 		.ascii	"rxBufSize\000"
+ 2849      6653697A 
+ 2849      6500
+ 2850              	.LASF140:
+ 2851 001a 43795F45 		.ascii	"Cy_EINK_Start\000"
+ 2851      494E4B5F 
+ 2851      53746172 
+ 2851      7400
+ 2852              	.LASF47:
+ 2853 0028 63795F65 		.ascii	"cy_en_scb_ezi2c_sub_addr_size_t\000"
+ 2853      6E5F7363 
+ 2853      625F657A 
+ 2853      6932635F 
+ 2853      7375625F 
+ 2854              	.LASF128:
+ 2855 0048 50565F45 		.ascii	"PV_EINK_ERROR_CHARGEPUMP\000"
+ 2855      494E4B5F 
+ 2855      4552524F 
+ 2855      525F4348 
+ 2855      41524745 
+ 2856              	.LASF156:
+ 2857 0061 43795F45 		.ascii	"Cy_EINK_TextToFrameBuffer\000"
+ 2857      494E4B5F 
+ 2857      54657874 
+ 2857      546F4672 
+ 2857      616D6542 
+ 2858              	.LASF155:
+ 2859 007b 6C696E65 		.ascii	"lineLength\000"
+ 2859      4C656E67 
+ 2859      746800
+ 2860              	.LASF68:
+ 2861 0086 62756631 		.ascii	"buf1\000"
+ 2861      00
+ 2862              	.LASF1:
+ 2863 008b 5F5F7569 		.ascii	"__uint8_t\000"
+ 2863      6E74385F 
+ 2863      7400
+ 2864              	.LASF98:
+ 2865 0095 63795F73 		.ascii	"cy_stc_ble_conn_handle_t\000"
+ 2865      74635F62 
+ 2865      6C655F63 
+ 2865      6F6E6E5F 
+ 2865      68616E64 
+ 2866              	.LASF28:
+ 2867 00ae 636F756E 		.ascii	"countDirection\000"
+ 2867      74446972 
+ 2867      65637469 
+ 2867      6F6E00
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 61
+
+
+ 2868              	.LASF40:
+ 2869 00bd 73746F70 		.ascii	"stopInputMode\000"
+ 2869      496E7075 
+ 2869      744D6F64 
+ 2869      6500
+ 2870              	.LASF8:
+ 2871 00cb 6C6F6E67 		.ascii	"long int\000"
+ 2871      20696E74 
+ 2871      00
+ 2872              	.LASF25:
+ 2873 00d4 70657269 		.ascii	"period\000"
+ 2873      6F6400
+ 2874              	.LASF149:
+ 2875 00db 6672616D 		.ascii	"frameBuffer\000"
+ 2875      65427566 
+ 2875      66657200 
+ 2876              	.LASF35:
+ 2877 00e7 63617074 		.ascii	"captureInput\000"
+ 2877      75726549 
+ 2877      6E707574 
+ 2877      00
+ 2878              	.LASF12:
+ 2879 00f4 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2879      206C6F6E 
+ 2879      6720756E 
+ 2879      7369676E 
+ 2879      65642069 
+ 2880              	.LASF179:
+ 2881 010b 50765F45 		.ascii	"Pv_EINK_FullStageHandler\000"
+ 2881      494E4B5F 
+ 2881      46756C6C 
+ 2881      53746167 
+ 2881      6548616E 
+ 2882              	.LASF26:
+ 2883 0124 636C6F63 		.ascii	"clockPrescaler\000"
+ 2883      6B507265 
+ 2883      7363616C 
+ 2883      657200
+ 2884              	.LASF90:
+ 2885 0133 72785269 		.ascii	"rxRingBuf\000"
+ 2885      6E674275 
+ 2885      6600
+ 2886              	.LASF122:
+ 2887 013d 70765F65 		.ascii	"pv_eink_frame_data_t\000"
+ 2887      696E6B5F 
+ 2887      6672616D 
+ 2887      655F6461 
+ 2887      74615F74 
+ 2888              	.LASF0:
+ 2889 0152 5F5F696E 		.ascii	"__int8_t\000"
+ 2889      74385F74 
+ 2889      00
+ 2890              	.LASF80:
+ 2891 015b 74784275 		.ascii	"txBuf\000"
+ 2891      6600
+ 2892              	.LASF113:
+ 2893 0161 666F6E74 		.ascii	"fontData\000"
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 62
+
+
+ 2893      44617461 
+ 2893      00
+ 2894              	.LASF62:
+ 2895 016a 73756241 		.ascii	"subAddrSize\000"
+ 2895      64647253 
+ 2895      697A6500 
+ 2896              	.LASF139:
+ 2897 0176 706F7765 		.ascii	"powerCtrl\000"
+ 2897      72437472 
+ 2897      6C00
+ 2898              	.LASF11:
+ 2899 0180 6C6F6E67 		.ascii	"long long int\000"
+ 2899      206C6F6E 
+ 2899      6720696E 
+ 2899      7400
+ 2900              	.LASF44:
+ 2901 018e 63795F73 		.ascii	"cy_stc_tcpwm_counter_config_t\000"
+ 2901      74635F74 
+ 2901      6370776D 
+ 2901      5F636F75 
+ 2901      6E746572 
+ 2902              	.LASF76:
+ 2903 01ac 63795F73 		.ascii	"cy_stc_scb_spi_context\000"
+ 2903      74635F73 
+ 2903      63625F73 
+ 2903      70695F63 
+ 2903      6F6E7465 
+ 2904              	.LASF95:
+ 2905 01c3 63795F73 		.ascii	"cy_stc_scb_uart_context_t\000"
+ 2905      74635F73 
+ 2905      63625F75 
+ 2905      6172745F 
+ 2905      636F6E74 
+ 2906              	.LASF10:
+ 2907 01dd 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2907      20756E73 
+ 2907      69676E65 
+ 2907      6420696E 
+ 2907      7400
+ 2908              	.LASF102:
+ 2909 01ef 43595F42 		.ascii	"CY_BLE_ADV_STATE_STOP_INITIATED\000"
+ 2909      4C455F41 
+ 2909      44565F53 
+ 2909      54415445 
+ 2909      5F53544F 
+ 2910              	.LASF75:
+ 2911 020f 63795F63 		.ascii	"cy_cb_scb_spi_handle_events_t\000"
+ 2911      625F7363 
+ 2911      625F7370 
+ 2911      695F6861 
+ 2911      6E646C65 
+ 2912              	.LASF60:
+ 2913 022d 61646472 		.ascii	"address1\000"
+ 2913      65737331 
+ 2913      00
+ 2914              	.LASF61:
+ 2915 0236 61646472 		.ascii	"address2\000"
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 63
+
+
+ 2915      65737332 
+ 2915      00
+ 2916              	.LASF145:
+ 2917 023f 70726576 		.ascii	"prevFrame\000"
+ 2917      4672616D 
+ 2917      6500
+ 2918              	.LASF66:
+ 2919 0249 63757242 		.ascii	"curBuf\000"
+ 2919      756600
+ 2920              	.LASF58:
+ 2921 0250 73746174 		.ascii	"state\000"
+ 2921      6500
+ 2922              	.LASF43:
+ 2923 0256 636F756E 		.ascii	"countInput\000"
+ 2923      74496E70 
+ 2923      757400
+ 2924              	.LASF103:
+ 2925 0261 63795F65 		.ascii	"cy_en_ble_adv_state_t\000"
+ 2925      6E5F626C 
+ 2925      655F6164 
+ 2925      765F7374 
+ 2925      6174655F 
+ 2926              	.LASF185:
+ 2927 0277 6D656D63 		.ascii	"memcpy\000"
+ 2927      707900
+ 2928              	.LASF4:
+ 2929 027e 73686F72 		.ascii	"short int\000"
+ 2929      7420696E 
+ 2929      7400
+ 2930              	.LASF19:
+ 2931 0288 75696E74 		.ascii	"uint16_t\000"
+ 2931      31365F74 
+ 2931      00
+ 2932              	.LASF23:
+ 2933 0291 646F7562 		.ascii	"double\000"
+ 2933      6C6500
+ 2934              	.LASF163:
+ 2935 0298 6672616D 		.ascii	"frameByte\000"
+ 2935      65427974 
+ 2935      6500
+ 2936              	.LASF138:
+ 2937 02a2 74656D70 		.ascii	"temperature\000"
+ 2937      65726174 
+ 2937      75726500 
+ 2938              	.LASF150:
+ 2939 02ae 696D6167 		.ascii	"image\000"
+ 2939      6500
+ 2940              	.LASF34:
+ 2941 02b4 63617074 		.ascii	"captureInputMode\000"
+ 2941      75726549 
+ 2941      6E707574 
+ 2941      4D6F6465 
+ 2941      00
+ 2942              	.LASF108:
+ 2943 02c5 43595F42 		.ascii	"CY_BLE_CONN_STATE_CLIENT_INCL_DISCOVERING\000"
+ 2943      4C455F43 
+ 2943      4F4E4E5F 
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 64
+
+
+ 2943      53544154 
+ 2943      455F434C 
+ 2944              	.LASF50:
+ 2945 02ef 43595F53 		.ascii	"CY_SCB_EZI2C_STATE_RX_OFFSET_MSB\000"
+ 2945      43425F45 
+ 2945      5A493243 
+ 2945      5F535441 
+ 2945      54455F52 
+ 2946              	.LASF124:
+ 2947 0310 50565F45 		.ascii	"PV_EINK_ERROR_BUSY\000"
+ 2947      494E4B5F 
+ 2947      4552524F 
+ 2947      525F4255 
+ 2947      535900
+ 2948              	.LASF9:
+ 2949 0323 5F5F7569 		.ascii	"__uint32_t\000"
+ 2949      6E743332 
+ 2949      5F7400
+ 2950              	.LASF135:
+ 2951 032e 43595F45 		.ascii	"CY_EINK_FULL_4STAGE\000"
+ 2951      494E4B5F 
+ 2951      46554C4C 
+ 2951      5F345354 
+ 2951      41474500 
+ 2952              	.LASF79:
+ 2953 0342 72784275 		.ascii	"rxBufIdx\000"
+ 2953      66496478 
+ 2953      00
+ 2954              	.LASF134:
+ 2955 034b 43595F45 		.ascii	"CY_EINK_PARTIAL\000"
+ 2955      494E4B5F 
+ 2955      50415254 
+ 2955      49414C00 
+ 2956              	.LASF57:
+ 2957 035b 63795F73 		.ascii	"cy_stc_scb_ezi2c_context\000"
+ 2957      74635F73 
+ 2957      63625F65 
+ 2957      7A693263 
+ 2957      5F636F6E 
+ 2958              	.LASF116:
+ 2959 0374 7853697A 		.ascii	"xSize\000"
+ 2959      6500
+ 2960              	.LASF81:
+ 2961 037a 74784275 		.ascii	"txBufSize\000"
+ 2961      6653697A 
+ 2961      6500
+ 2962              	.LASF72:
+ 2963 0384 62756632 		.ascii	"buf2Size\000"
+ 2963      53697A65 
+ 2963      00
+ 2964              	.LASF13:
+ 2965 038d 756E7369 		.ascii	"unsigned int\000"
+ 2965      676E6564 
+ 2965      20696E74 
+ 2965      00
+ 2966              	.LASF106:
+ 2967 039a 43595F42 		.ascii	"CY_BLE_CONN_STATE_CONNECTED\000"
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 65
+
+
+ 2967      4C455F43 
+ 2967      4F4E4E5F 
+ 2967      53544154 
+ 2967      455F434F 
+ 2968              	.LASF73:
+ 2969 03b6 62756632 		.ascii	"buf2rwBondary\000"
+ 2969      7277426F 
+ 2969      6E646172 
+ 2969      7900
+ 2970              	.LASF165:
+ 2971 03c4 76657274 		.ascii	"verticalCounter\000"
+ 2971      6963616C 
+ 2971      436F756E 
+ 2971      74657200 
+ 2972              	.LASF147:
+ 2973 03d4 75706461 		.ascii	"updateType\000"
+ 2973      74655479 
+ 2973      706500
+ 2974              	.LASF121:
+ 2975 03df 63795F65 		.ascii	"cy_eink_font_t\000"
+ 2975      696E6B5F 
+ 2975      666F6E74 
+ 2975      5F7400
+ 2976              	.LASF6:
+ 2977 03ee 73686F72 		.ascii	"short unsigned int\000"
+ 2977      7420756E 
+ 2977      7369676E 
+ 2977      65642069 
+ 2977      6E7400
+ 2978              	.LASF49:
+ 2979 0401 43595F53 		.ascii	"CY_SCB_EZI2C_STATE_ADDR\000"
+ 2979      43425F45 
+ 2979      5A493243 
+ 2979      5F535441 
+ 2979      54455F41 
+ 2980              	.LASF119:
+ 2981 0419 79537061 		.ascii	"ySpan\000"
+ 2981      6E00
+ 2982              	.LASF160:
+ 2983 041f 63757272 		.ascii	"currentChar\000"
+ 2983      656E7443 
+ 2983      68617200 
+ 2984              	.LASF158:
+ 2985 042b 666F6E74 		.ascii	"fontInfo\000"
+ 2985      496E666F 
+ 2985      00
+ 2986              	.LASF170:
+ 2987 0434 63795F62 		.ascii	"cy_ble_connState\000"
+ 2987      6C655F63 
+ 2987      6F6E6E53 
+ 2987      74617465 
+ 2987      00
+ 2988              	.LASF173:
+ 2989 0445 55617274 		.ascii	"Uart_Printf_context\000"
+ 2989      5F507269 
+ 2989      6E74665F 
+ 2989      636F6E74 
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 66
+
+
+ 2989      65787400 
+ 2990              	.LASF83:
+ 2991 0459 63624576 		.ascii	"cbEvents\000"
+ 2991      656E7473 
+ 2991      00
+ 2992              	.LASF136:
+ 2993 0462 43595F45 		.ascii	"CY_EINK_FULL_2STAGE\000"
+ 2993      494E4B5F 
+ 2993      46554C4C 
+ 2993      5F325354 
+ 2993      41474500 
+ 2994              	.LASF133:
+ 2995 0476 63795F65 		.ascii	"cy_eink_frame_t\000"
+ 2995      696E6B5F 
+ 2995      6672616D 
+ 2995      655F7400 
+ 2996              	.LASF129:
+ 2997 0486 50565F45 		.ascii	"PV_EINK_STAGE1\000"
+ 2997      494E4B5F 
+ 2997      53544147 
+ 2997      453100
+ 2998              	.LASF130:
+ 2999 0495 50565F45 		.ascii	"PV_EINK_STAGE2\000"
+ 2999      494E4B5F 
+ 2999      53544147 
+ 2999      453200
+ 3000              	.LASF131:
+ 3001 04a4 50565F45 		.ascii	"PV_EINK_STAGE3\000"
+ 3001      494E4B5F 
+ 3001      53544147 
+ 3001      453300
+ 3002              	.LASF132:
+ 3003 04b3 50565F45 		.ascii	"PV_EINK_STAGE4\000"
+ 3003      494E4B5F 
+ 3003      53544147 
+ 3003      453400
+ 3004              	.LASF7:
+ 3005 04c2 5F5F696E 		.ascii	"__int32_t\000"
+ 3005      7433325F 
+ 3005      7400
+ 3006              	.LASF92:
+ 3007 04cc 72785269 		.ascii	"rxRingBufHead\000"
+ 3007      6E674275 
+ 3007      66486561 
+ 3007      6400
+ 3008              	.LASF120:
+ 3009 04da 636F6C6F 		.ascii	"color\000"
+ 3009      7200
+ 3010              	.LASF42:
+ 3011 04e0 636F756E 		.ascii	"countInputMode\000"
+ 3011      74496E70 
+ 3011      75744D6F 
+ 3011      646500
+ 3012              	.LASF39:
+ 3013 04ef 73746172 		.ascii	"startInput\000"
+ 3013      74496E70 
+ 3013      757400
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 67
+
+
+ 3014              	.LASF97:
+ 3015 04fa 61747449 		.ascii	"attId\000"
+ 3015      6400
+ 3016              	.LASF56:
+ 3017 0500 63795F73 		.ascii	"cy_stc_tcpwm_counter_config\000"
+ 3017      74635F74 
+ 3017      6370776D 
+ 3017      5F636F75 
+ 3017      6E746572 
+ 3018              	.LASF114:
+ 3019 051c 784F6666 		.ascii	"xOffset\000"
+ 3019      73657400 
+ 3020              	.LASF153:
+ 3021 0524 70697865 		.ascii	"pixelLineCounter\000"
+ 3021      6C4C696E 
+ 3021      65436F75 
+ 3021      6E746572 
+ 3021      00
+ 3022              	.LASF15:
+ 3023 0535 73697A65 		.ascii	"sizetype\000"
+ 3023      74797065 
+ 3023      00
+ 3024              	.LASF14:
+ 3025 053e 6C6F6E67 		.ascii	"long double\000"
+ 3025      20646F75 
+ 3025      626C6500 
+ 3026              	.LASF174:
+ 3027 054a 4932435F 		.ascii	"I2C_context\000"
+ 3027      636F6E74 
+ 3027      65787400 
+ 3028              	.LASF112:
+ 3029 0556 63795F65 		.ascii	"cy_en_ble_conn_state_t\000"
+ 3029      6E5F626C 
+ 3029      655F636F 
+ 3029      6E6E5F73 
+ 3029      74617465 
+ 3030              	.LASF100:
+ 3031 056d 43595F42 		.ascii	"CY_BLE_ADV_STATE_ADV_INITIATED\000"
+ 3031      4C455F41 
+ 3031      44565F53 
+ 3031      54415445 
+ 3031      5F414456 
+ 3032              	.LASF48:
+ 3033 058c 43595F53 		.ascii	"CY_SCB_EZI2C_STATE_IDLE\000"
+ 3033      43425F45 
+ 3033      5A493243 
+ 3033      5F535441 
+ 3033      54455F49 
+ 3034              	.LASF175:
+ 3035 05a4 50765F45 		.ascii	"Pv_EINK_Init\000"
+ 3035      494E4B5F 
+ 3035      496E6974 
+ 3035      00
+ 3036              	.LASF148:
+ 3037 05b1 43795F45 		.ascii	"Cy_EINK_ImageToFrameBuffer\000"
+ 3037      494E4B5F 
+ 3037      496D6167 
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 68
+
+
+ 3037      65546F46 
+ 3037      72616D65 
+ 3038              	.LASF89:
+ 3039 05cc 72785374 		.ascii	"rxStatus\000"
+ 3039      61747573 
+ 3039      00
+ 3040              	.LASF52:
+ 3041 05d5 43595F53 		.ascii	"CY_SCB_EZI2C_STATE_RX_DATA0\000"
+ 3041      43425F45 
+ 3041      5A493243 
+ 3041      5F535441 
+ 3041      54455F52 
+ 3042              	.LASF53:
+ 3043 05f1 43595F53 		.ascii	"CY_SCB_EZI2C_STATE_RX_DATA1\000"
+ 3043      43425F45 
+ 3043      5A493243 
+ 3043      5F535441 
+ 3043      54455F52 
+ 3044              	.LASF181:
+ 3045 060d 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 3045      43313120 
+ 3045      352E342E 
+ 3045      31203230 
+ 3045      31363036 
+ 3046 0640 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m4 -mfloat-abi=s"
+ 3046      20726576 
+ 3046      6973696F 
+ 3046      6E203233 
+ 3046      37373135 
+ 3047 0673 6F667466 		.ascii	"oftfp -mfpu=fpv4-sp-d16 -mthumb -g -Og -ffunction-s"
+ 3047      70202D6D 
+ 3047      6670753D 
+ 3047      66707634 
+ 3047      2D73702D 
+ 3048 06a6 65637469 		.ascii	"ections -ffat-lto-objects\000"
+ 3048      6F6E7320 
+ 3048      2D666661 
+ 3048      742D6C74 
+ 3048      6F2D6F62 
+ 3049              	.LASF161:
+ 3050 06c0 7072696E 		.ascii	"printLocation\000"
+ 3050      744C6F63 
+ 3050      6174696F 
+ 3050      6E00
+ 3051              	.LASF111:
+ 3052 06ce 43595F42 		.ascii	"CY_BLE_CONN_STATE_CLIENT_DISCOVERED\000"
+ 3052      4C455F43 
+ 3052      4F4E4E5F 
+ 3052      53544154 
+ 3052      455F434C 
+ 3053              	.LASF22:
+ 3054 06f2 666C6F61 		.ascii	"float\000"
+ 3054      7400
+ 3055              	.LASF151:
+ 3056 06f8 696D6743 		.ascii	"imgCoordinates\000"
+ 3056      6F6F7264 
+ 3056      696E6174 
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 69
+
+
+ 3056      657300
+ 3057              	.LASF94:
+ 3058 0707 74784C65 		.ascii	"txLeftToTransmit\000"
+ 3058      6674546F 
+ 3058      5472616E 
+ 3058      736D6974 
+ 3058      00
+ 3059              	.LASF55:
+ 3060 0718 63795F65 		.ascii	"cy_en_scb_ezi2c_state_t\000"
+ 3060      6E5F7363 
+ 3060      625F657A 
+ 3060      6932635F 
+ 3060      73746174 
+ 3061              	.LASF125:
+ 3062 0730 50565F45 		.ascii	"PV_EINK_ERROR_ID\000"
+ 3062      494E4B5F 
+ 3062      4552524F 
+ 3062      525F4944 
+ 3062      00
+ 3063              	.LASF177:
+ 3064 0741 50765F45 		.ascii	"Pv_EINK_HardwarePowerOn\000"
+ 3064      494E4B5F 
+ 3064      48617264 
+ 3064      77617265 
+ 3064      506F7765 
+ 3065              	.LASF123:
+ 3066 0759 50565F45 		.ascii	"PV_EINK_RES_OK\000"
+ 3066      494E4B5F 
+ 3066      5245535F 
+ 3066      4F4B00
+ 3067              	.LASF109:
+ 3068 0768 43595F42 		.ascii	"CY_BLE_CONN_STATE_CLIENT_CHAR_DISCOVERING\000"
+ 3068      4C455F43 
+ 3068      4F4E4E5F 
+ 3068      53544154 
+ 3068      455F434C 
+ 3069              	.LASF38:
+ 3070 0792 73746172 		.ascii	"startInputMode\000"
+ 3070      74496E70 
+ 3070      75744D6F 
+ 3070      646500
+ 3071              	.LASF20:
+ 3072 07a1 696E7433 		.ascii	"int32_t\000"
+ 3072      325F7400 
+ 3073              	.LASF3:
+ 3074 07a9 756E7369 		.ascii	"unsigned char\000"
+ 3074      676E6564 
+ 3074      20636861 
+ 3074      7200
+ 3075              	.LASF137:
+ 3076 07b7 63795F65 		.ascii	"cy_eink_update_t\000"
+ 3076      696E6B5F 
+ 3076      75706461 
+ 3076      74655F74 
+ 3076      00
+ 3077              	.LASF167:
+ 3078 07c8 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 70
+
+
+ 3078      52784275 
+ 3078      66666572 
+ 3078      00
+ 3079              	.LASF146:
+ 3080 07d5 6E657746 		.ascii	"newFrame\000"
+ 3080      72616D65 
+ 3080      00
+ 3081              	.LASF32:
+ 3082 07de 656E6162 		.ascii	"enableCompareSwap\000"
+ 3082      6C65436F 
+ 3082      6D706172 
+ 3082      65537761 
+ 3082      7000
+ 3083              	.LASF69:
+ 3084 07f0 62756631 		.ascii	"buf1Size\000"
+ 3084      53697A65 
+ 3084      00
+ 3085              	.LASF180:
+ 3086 07f9 50765F45 		.ascii	"Pv_EINK_PartialStageHandler\000"
+ 3086      494E4B5F 
+ 3086      50617274 
+ 3086      69616C53 
+ 3086      74616765 
+ 3087              	.LASF59:
+ 3088 0815 73746174 		.ascii	"status\000"
+ 3088      757300
+ 3089              	.LASF82:
+ 3090 081c 74784275 		.ascii	"txBufIdx\000"
+ 3090      66496478 
+ 3090      00
+ 3091              	.LASF29:
+ 3092 0825 636F6D70 		.ascii	"compareOrCapture\000"
+ 3092      6172654F 
+ 3092      72436170 
+ 3092      74757265 
+ 3092      00
+ 3093              	.LASF110:
+ 3094 0836 43595F42 		.ascii	"CY_BLE_CONN_STATE_CLIENT_DESCR_DISCOVERING\000"
+ 3094      4C455F43 
+ 3094      4F4E4E5F 
+ 3094      53544154 
+ 3094      455F434C 
+ 3095              	.LASF142:
+ 3096 0861 6261636B 		.ascii	"background\000"
+ 3096      67726F75 
+ 3096      6E6400
+ 3097              	.LASF157:
+ 3098 086c 73747269 		.ascii	"string\000"
+ 3098      6E6700
+ 3099              	.LASF21:
+ 3100 0873 75696E74 		.ascii	"uint32_t\000"
+ 3100      33325F74 
+ 3100      00
+ 3101              	.LASF182:
+ 3102 087c 63795F65 		.ascii	"cy_eink_library.c\000"
+ 3102      696E6B5F 
+ 3102      6C696272 
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 71
+
+
+ 3102      6172792E 
+ 3102      6300
+ 3103              	.LASF65:
+ 3104 088e 61646472 		.ascii	"addr1Active\000"
+ 3104      31416374 
+ 3104      69766500 
+ 3105              	.LASF166:
+ 3106 089a 686F7269 		.ascii	"horizontalCounter\000"
+ 3106      7A6F6E74 
+ 3106      616C436F 
+ 3106      756E7465 
+ 3106      7200
+ 3107              	.LASF85:
+ 3108 08ac 63795F73 		.ascii	"cy_stc_scb_spi_context_t\000"
+ 3108      74635F73 
+ 3108      63625F73 
+ 3108      70695F63 
+ 3108      6F6E7465 
+ 3109              	.LASF30:
+ 3110 08c5 636F6D70 		.ascii	"compare0\000"
+ 3110      61726530 
+ 3110      00
+ 3111              	.LASF31:
+ 3112 08ce 636F6D70 		.ascii	"compare1\000"
+ 3112      61726531 
+ 3112      00
+ 3113              	.LASF67:
+ 3114 08d7 62756653 		.ascii	"bufSize\000"
+ 3114      697A6500 
+ 3115              	.LASF16:
+ 3116 08df 63686172 		.ascii	"char\000"
+ 3116      00
+ 3117              	.LASF162:
+ 3118 08e4 63686172 		.ascii	"charLocation\000"
+ 3118      4C6F6361 
+ 3118      74696F6E 
+ 3118      00
+ 3119              	.LASF54:
+ 3120 08f1 43595F53 		.ascii	"CY_SCB_EZI2C_STATE_TX_DATA\000"
+ 3120      43425F45 
+ 3120      5A493243 
+ 3120      5F535441 
+ 3120      54455F54 
+ 3121              	.LASF118:
+ 3122 090c 78537061 		.ascii	"xSpan\000"
+ 3122      6E00
+ 3123              	.LASF5:
+ 3124 0912 5F5F7569 		.ascii	"__uint16_t\000"
+ 3124      6E743136 
+ 3124      5F7400
+ 3125              	.LASF164:
+ 3126 091d 666F6E74 		.ascii	"fontByte\000"
+ 3126      42797465 
+ 3126      00
+ 3127              	.LASF183:
+ 3128 0926 433A5C55 		.ascii	"C:\\Users\\User\\Desktop\\SmartBottle_v0p1\\SmartBo"
+ 3128      73657273 
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 72
+
+
+ 3128      5C557365 
+ 3128      725C4465 
+ 3128      736B746F 
+ 3129 0954 74746C65 		.ascii	"ttle_v0p1.cydsn\000"
+ 3129      5F763070 
+ 3129      312E6379 
+ 3129      64736E00 
+ 3130              	.LASF144:
+ 3131 0964 43795F45 		.ascii	"Cy_EINK_ShowFrame\000"
+ 3131      494E4B5F 
+ 3131      53686F77 
+ 3131      4672616D 
+ 3131      6500
+ 3132              	.LASF168:
+ 3133 0976 63795F62 		.ascii	"cy_ble_advState\000"
+ 3133      6C655F61 
+ 3133      64765374 
+ 3133      61746500 
+ 3134              	.LASF152:
+ 3135 0986 70777253 		.ascii	"pwrStatus\000"
+ 3135      74617475 
+ 3135      7300
+ 3136              	.LASF33:
+ 3137 0990 696E7465 		.ascii	"interruptSources\000"
+ 3137      72727570 
+ 3137      74536F75 
+ 3137      72636573 
+ 3137      00
+ 3138              	.LASF37:
+ 3139 09a1 72656C6F 		.ascii	"reloadInput\000"
+ 3139      6164496E 
+ 3139      70757400 
+ 3140              	.LASF107:
+ 3141 09ad 43595F42 		.ascii	"CY_BLE_CONN_STATE_CLIENT_SRVC_DISCOVERING\000"
+ 3141      4C455F43 
+ 3141      4F4E4E5F 
+ 3141      53544154 
+ 3141      455F434C 
+ 3142              	.LASF86:
+ 3143 09d7 63795F63 		.ascii	"cy_cb_scb_uart_handle_events_t\000"
+ 3143      625F7363 
+ 3143      625F7561 
+ 3143      72745F68 
+ 3143      616E646C 
+ 3144              	.LASF46:
+ 3145 09f6 43595F53 		.ascii	"CY_SCB_EZI2C_SUB_ADDR16_BITS\000"
+ 3145      43425F45 
+ 3145      5A493243 
+ 3145      5F535542 
+ 3145      5F414444 
+ 3146              	.LASF41:
+ 3147 0a13 73746F70 		.ascii	"stopInput\000"
+ 3147      496E7075 
+ 3147      7400
+ 3148              	.LASF91:
+ 3149 0a1d 72785269 		.ascii	"rxRingBufSize\000"
+ 3149      6E674275 
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 73
+
+
+ 3149      6653697A 
+ 3149      6500
+ 3150              	.LASF159:
+ 3151 0a2b 666F6E74 		.ascii	"fontCor\000"
+ 3151      436F7200 
+ 3152              	.LASF17:
+ 3153 0a33 696E7438 		.ascii	"int8_t\000"
+ 3153      5F7400
+ 3154              	.LASF84:
+ 3155 0a3a 696E6974 		.ascii	"initKey\000"
+ 3155      4B657900 
+ 3156              	.LASF77:
+ 3157 0a42 72784275 		.ascii	"rxBuf\000"
+ 3157      6600
+ 3158              	.LASF45:
+ 3159 0a48 43595F53 		.ascii	"CY_SCB_EZI2C_SUB_ADDR8_BITS\000"
+ 3159      43425F45 
+ 3159      5A493243 
+ 3159      5F535542 
+ 3159      5F414444 
+ 3160              	.LASF24:
+ 3161 0a64 5F426F6F 		.ascii	"_Bool\000"
+ 3161      6C00
+ 3162              	.LASF104:
+ 3163 0a6a 43595F42 		.ascii	"CY_BLE_CONN_STATE_DISCONNECTED\000"
+ 3163      4C455F43 
+ 3163      4F4E4E5F 
+ 3163      53544154 
+ 3163      455F4449 
+ 3164              	.LASF169:
+ 3165 0a89 63795F62 		.ascii	"cy_ble_connHandle\000"
+ 3165      6C655F63 
+ 3165      6F6E6E48 
+ 3165      616E646C 
+ 3165      6500
+ 3166              	.LASF143:
+ 3167 0a9b 706F7765 		.ascii	"powerCycle\000"
+ 3167      72437963 
+ 3167      6C6500
+ 3168              	.LASF171:
+ 3169 0aa6 43595F45 		.ascii	"CY_EINK_SPIM_context\000"
+ 3169      494E4B5F 
+ 3169      5350494D 
+ 3169      5F636F6E 
+ 3169      74657874 
+ 3170              	.LASF71:
+ 3171 0abb 62756632 		.ascii	"buf2\000"
+ 3171      00
+ 3172              	.LASF154:
+ 3173 0ac0 73746172 		.ascii	"startLocation\000"
+ 3173      744C6F63 
+ 3173      6174696F 
+ 3173      6E00
+ 3174              	.LASF176:
+ 3175 0ace 50765F45 		.ascii	"Pv_EINK_SetTempFactor\000"
+ 3175      494E4B5F 
+ 3175      53657454 
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 74
+
+
+ 3175      656D7046 
+ 3175      6163746F 
+ 3176              	.LASF101:
+ 3177 0ae4 43595F42 		.ascii	"CY_BLE_ADV_STATE_ADVERTISING\000"
+ 3177      4C455F41 
+ 3177      44565F53 
+ 3177      54415445 
+ 3177      5F414456 
+ 3178              	.LASF99:
+ 3179 0b01 43595F42 		.ascii	"CY_BLE_ADV_STATE_STOPPED\000"
+ 3179      4C455F41 
+ 3179      44565F53 
+ 3179      54415445 
+ 3179      5F53544F 
+ 3180              	.LASF18:
+ 3181 0b1a 75696E74 		.ascii	"uint8_t\000"
+ 3181      385F7400 
+ 3182              	.LASF51:
+ 3183 0b22 43595F53 		.ascii	"CY_SCB_EZI2C_STATE_RX_OFFSET_LSB\000"
+ 3183      43425F45 
+ 3183      5A493243 
+ 3183      5F535441 
+ 3183      54455F52 
+ 3184              	.LASF172:
+ 3185 0b43 43595F45 		.ascii	"CY_EINK_Timer_config\000"
+ 3185      494E4B5F 
+ 3185      54696D65 
+ 3185      725F636F 
+ 3185      6E666967 
+ 3186              	.LASF74:
+ 3187 0b58 63795F73 		.ascii	"cy_stc_scb_ezi2c_context_t\000"
+ 3187      74635F73 
+ 3187      63625F65 
+ 3187      7A693263 
+ 3187      5F636F6E 
+ 3188              	.LASF36:
+ 3189 0b73 72656C6F 		.ascii	"reloadInputMode\000"
+ 3189      6164496E 
+ 3189      7075744D 
+ 3189      6F646500 
+ 3190              	.LASF178:
+ 3191 0b83 50765F45 		.ascii	"Pv_EINK_HardwarePowerOff\000"
+ 3191      494E4B5F 
+ 3191      48617264 
+ 3191      77617265 
+ 3191      506F7765 
+ 3192              	.LASF93:
+ 3193 0b9c 72785269 		.ascii	"rxRingBufTail\000"
+ 3193      6E674275 
+ 3193      66546169 
+ 3193      6C00
+ 3194              	.LASF70:
+ 3195 0baa 62756631 		.ascii	"buf1rwBondary\000"
+ 3195      7277426F 
+ 3195      6E646172 
+ 3195      7900
+ 3196              	.LASF117:
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 75
+
+
+ 3197 0bb8 7953697A 		.ascii	"ySize\000"
+ 3197      6500
+ 3198              	.LASF126:
+ 3199 0bbe 50565F45 		.ascii	"PV_EINK_ERROR_BREAKAGE\000"
+ 3199      494E4B5F 
+ 3199      4552524F 
+ 3199      525F4252 
+ 3199      45414B41 
+ 3200              	.LASF96:
+ 3201 0bd5 62644861 		.ascii	"bdHandle\000"
+ 3201      6E646C65 
+ 3201      00
+ 3202              	.LASF88:
+ 3203 0bde 74785374 		.ascii	"txStatus\000"
+ 3203      61747573 
+ 3203      00
+ 3204              	.LASF2:
+ 3205 0be7 7369676E 		.ascii	"signed char\000"
+ 3205      65642063 
+ 3205      68617200 
+ 3206              	.LASF63:
+ 3207 0bf3 62617365 		.ascii	"baseAddr1\000"
+ 3207      41646472 
+ 3207      3100
+ 3208              	.LASF64:
+ 3209 0bfd 62617365 		.ascii	"baseAddr2\000"
+ 3209      41646472 
+ 3209      3200
+ 3210              	.LASF127:
+ 3211 0c07 50565F45 		.ascii	"PV_EINK_ERROR_DC\000"
+ 3211      494E4B5F 
+ 3211      4552524F 
+ 3211      525F4443 
+ 3211      00
+ 3212              	.LASF87:
+ 3213 0c18 63795F73 		.ascii	"cy_stc_scb_uart_context\000"
+ 3213      74635F73 
+ 3213      63625F75 
+ 3213      6172745F 
+ 3213      636F6E74 
+ 3214              	.LASF141:
+ 3215 0c30 43795F45 		.ascii	"Cy_EINK_Clear\000"
+ 3215      494E4B5F 
+ 3215      436C6561 
+ 3215      7200
+ 3216              	.LASF105:
+ 3217 0c3e 43595F42 		.ascii	"CY_BLE_CONN_STATE_CLIENT_DISCONNECTED_DISCOVERED\000"
+ 3217      4C455F43 
+ 3217      4F4E4E5F 
+ 3217      53544154 
+ 3217      455F434C 
+ 3218              	.LASF184:
+ 3219 0c6f 43795F45 		.ascii	"Cy_EINK_Power\000"
+ 3219      494E4B5F 
+ 3219      506F7765 
+ 3219      7200
+ 3220              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
+ARM GAS  C:\Users\User\AppData\Local\Temp\ccrnMyQZ.s 			page 76
+
+

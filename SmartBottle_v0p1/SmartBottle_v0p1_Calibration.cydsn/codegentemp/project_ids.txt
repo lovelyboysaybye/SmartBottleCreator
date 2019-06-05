@@ -1,0 +1,7 @@
+C:\Users\User\Desktop\SmartBottle_v0p1\SmartBottle_v0p1_Calibration.cydsn\SmartBottle_v0p1_Calibration.cyprj|59af0715-f5d7-4b1d-a8be-0577359ff39b
+D:\CyPRess Creator\PSoC Creator\4.2\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|e8b570b8-0ee2-4f17-a2ad-d697f85ae45c
+C:\Users\User\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Downloads ( 4.2).cyprj|e8f7596a-c2dd-4208-be38-f02d81eb3f4e
+D:\CyPRess Creator\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|09cf5d95-c1b2-4db6-a768-9480a1a8b7e1
+D:\CyPRess Creator\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|845f6d81-e928-4b4d-9500-4f23e8abaa77
+D:\CyPRess Creator\PSoC Creator\4.2\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|036b9764-60d1-449b-a785-4e1623b998d1
+C:\Users\User\Desktop\SmartBottle_v0p1\SmartBottle_v0p1.cydsn\SmartBottle_v0p1.cyprj|537a3f71-6327-42b0-9b81-e95db3c1d1a1
