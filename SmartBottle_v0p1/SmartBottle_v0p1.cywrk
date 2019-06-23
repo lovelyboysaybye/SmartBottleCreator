@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="utf-8"?>
 <CyXmlSerializer>
 <!--This file is machine generated and read. It is not intended to be edited by hand.-->
-<!--Due to this, there is no schema for this file.-->
+<!--Due to this, there is no schema for this file. Try add something-->
 <CyGuid_2867d519-54d2-4c01-9830-c51cb08bc3dd type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWorkspaceSerialize" version="5" xml_contents_version="3" name="SmartBottle_v0p1" persistent="SmartBottle_v0p1.cywrk" platform="NOT_USED">
 <current_project name=".\SmartBottle_v0p1.cydsn\SmartBottle_v0p1.cyprj" />
 <wrkspc_folders />
